@@ -78,7 +78,6 @@ dependencies:
   - sympy=1.12=py310haa95532_0
   - tbb=2021.8.0=h59b6b97_0
   - tk=8.6.12=h2bbff1b_0
-  - typing_extensions=4.9.0=py310haa95532_1
   - vc=14.2=h21ff451_1
   - vs2015_runtime=14.27.29016=h5e58377_2
   - wheel=0.41.2=py310haa95532_0
@@ -144,7 +143,6 @@ dependencies:
       - tensorboard-data-server==0.7.2
       - thop==0.1.1-2209072238
       - tifffile==2024.2.12
-      - torch==2.2.2
       - torchaudio==2.2.2
       - torchvision==0.17.2
       - tqdm==4.66.2

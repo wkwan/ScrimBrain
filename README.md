@@ -4,7 +4,11 @@ ScrimBrain aims to help competitive gamers of all skill levels improve more effi
 
 The current model is trained on this map: https://www.fortnite.com/@necrogames/8136-5511-4930
 
-The model ingests real-time screen capture and predicts keyboard/mouse inputs to simulate. Although Fortnite is the first use-case, the system is designed to work with any game that runs on Windows.
+The model ingests real-time screen capture and predicts keyboard/mouse inputs to simulate. 
+
+Soon, we’ll be offering model checkpoints trained on different UEFN maps and performing at different skill levels to suit various practice needs.
+
+Although Fortnite is the first use-case, the system is designed to work with any game that runs on Windows, and we'll be adding extensive documentation to help developers train their own models.
 
 ## Setup
 

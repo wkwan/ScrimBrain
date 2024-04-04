@@ -1,6 +1,6 @@
 # ScrimBrain - Reinforcement Learning Agents for Fortnite 1v1's
 
-ScrimBrain aims to help competitive gamers of all skill levels improve more efficiently. To do this, we’re building an open-source reinforcement learning framework to train practice bots for games, starting with Fortnite 1v1’s. 
+ScrimBrain aims to help competitive gamers of all skill levels improve more efficiently. To do this, we’re building an open-source reinforcement learning framework to train practice bots for games, starting with Fortnite 1v1’s. This is the first reinforcement learning framework targeted to gamers, as opposed to AI researchers.
 
 The current model is trained on this map: https://www.fortnite.com/@necrogames/8136-5511-4930
 

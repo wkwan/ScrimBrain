@@ -106,13 +106,16 @@ class FortniteEnv(gym.Env):
         return DetectionState.DETECTED_NOTHING
 
     def step(self, action):
-        reward = 0
-        moved = False
+
+        reward = -1
+        if self.player_killed_opponent_cooldown_period:
+            reward = 0
+        # moved = False
         # if self.cur_step % 3 == 0:
         for i in range(len(holdable_vertical_move_keys)):
             if action[0] == i:
                 pyautogui.keyDown(holdable_vertical_move_keys[i])
-                moved = True
+                # moved = True
                 # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
             else:
                 pyautogui.keyUp(holdable_vertical_move_keys[i])
@@ -120,7 +123,7 @@ class FortniteEnv(gym.Env):
         for i in range(len(holdable_horizontal_move_keys)):
             if action[1] == i:
                 pyautogui.keyDown(holdable_horizontal_move_keys[i])
-                moved = True
+                # moved = True
                 # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
             else:
                 pyautogui.keyUp(holdable_horizontal_move_keys[i])
@@ -130,8 +133,8 @@ class FortniteEnv(gym.Env):
             #         pyautogui.press(pressable_keys[i])
             #         # print("pressable_keys press: ", pressable_keys[i])
 
-        if moved:
-            reward -= 1
+        # if moved:
+        #     reward -= 1
 
         # for i in range(len(pressable_mode_keys)):
         #     if action[2] == i:
@@ -160,7 +163,8 @@ class FortniteEnv(gym.Env):
         except Exception as e:
             # print(f"step {self.cur_step} player health ocr failed {e}")  
             print(f"step {self.cur_step} screencap fail {e}")  
-    
+
+
         terminated = False
         if player_full_img is not None:
             try:
@@ -168,10 +172,14 @@ class FortniteEnv(gym.Env):
                 if player_killed_opponent_detected == DetectionState.DETECTED_TARGET:
                     if not self.player_killed_opponent_cooldown_period:
                         reward += 10000
-                        # reward = 1
                         self.player_killed_opponent_cooldown_period = True
                         print(f"step {self.cur_step} player killed opponent")
                 elif player_killed_opponent_detected == DetectionState.DETECTED_NOTHING:
+                    if self.player_killed_opponent_cooldown_period:
+                        self.player_killed_opponent_cooldown_period = False
+                        print(f"step {self.cur_step} player killed opponent cooldown period terminated episode")
+                        return player_obs, 0, True, False, {}
+    
                     self.player_killed_opponent_cooldown_period = False  
             except Exception as e:
                 print(f"step {self.cur_step} player elim detect failed {e}")
@@ -181,10 +189,13 @@ class FortniteEnv(gym.Env):
                 if opponent_killed_player_detected == DetectionState.DETECTED_TARGET:
                     if not self.opponent_killed_player_cooldown_period:
                         reward -= 10000
-                        # reward = -1
                         self.opponent_killed_player_cooldown_period = True
                         print(f"step {self.cur_step} opponent killed player")
                 elif opponent_killed_player_detected == DetectionState.DETECTED_NOTHING:
+                    if self.opponent_killed_player_cooldown_period:
+                        self.opponent_killed_player_cooldown_period = False
+                        print(f"step {self.cur_step} opponent killed player cooldown period terminated episode")
+                        return player_obs, -1, True, False, {}
                     self.opponent_killed_player_cooldown_period = False  
             except Exception as e:
                 print(f"step {self.cur_step} opponent killed player detect failed {e}")
@@ -219,7 +230,7 @@ class FortniteEnv(gym.Env):
         global has_at_least_one_nonzero_reward_during_learn_phase
         if reward != 0:
             has_at_least_one_nonzero_reward_during_learn_phase = True
-            print(f"{self.cur_step} reward: ", reward)
+            # print(f"{self.cur_step} reward: ", reward)
 
         self.cur_step += 1
         return player_obs, reward, terminated, truncated, info

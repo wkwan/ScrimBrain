@@ -28,6 +28,10 @@ class VecFrameStackSaveOnKill(VecFrameStack):
         if (abs(rewards[0]) > 9000):
             for i in range(self.n_stack):
                 Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_player_killed_opponent_stacked/step_{self.cur_step}_{i}_player_killed_opponent.png")
+        # else:
+        #     for i in range(self.n_stack):
+        #         Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/stacked/step_{self.cur_step}_{i}.png")
+        # print(rewards, dones)
         self.cur_step += 1
         return self.stackedobs, rewards, dones, infos
 
@@ -40,6 +44,7 @@ if os.path.isfile(checkpoint_path):
     model = RecurrentPPO.load(checkpoint_path)
     model.set_env(env)
 else:
+    print("new model")
     env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, env_kwargs={'use_yolo_reward': args.use_yolo_reward}), n_stack=4, starting_timestep=0)
     Path(f'{args.checkpoint_folder}/img_player_killed_opponent_stacked').mkdir(parents=True, exist_ok=True)
     model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')

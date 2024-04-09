@@ -112,7 +112,7 @@ class FortniteEnv(gym.Env):
         return DetectionState.DETECTED_NOTHING
 
     def step(self, action):
-        print(action)
+        # print(action)
 
         # reward = -1
         # if self.player_killed_opponent_cooldown_period:

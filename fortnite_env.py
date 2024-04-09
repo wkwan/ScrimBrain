@@ -13,13 +13,13 @@ pyautogui.PAUSE = 0
 import vgamepad as vg
 gamepad = vg.VX360Gamepad()
 
-from ultralytics import YOLO
-yolo_model = YOLO('yolov9e.pt')
+# from ultralytics import YOLO
+# yolo_model = YOLO('yolov9e.pt')
 
 N_CHANNELS = 3
 HEIGHT = 1080
 WIDTH = 1920
-MAX_Y_DIST_TO_CROSSHAIR = HEIGHT/2
+# MAX_Y_DIST_TO_CROSSHAIR = HEIGHT/2
 MAX_DISTANCE_TO_CROSSHAIR = math.sqrt((HEIGHT/2) ** 2 + (WIDTH/2) **2)
 
 class DetectionState(Enum):
@@ -61,13 +61,15 @@ holdable_keys = [
 #     # '9', #change building material
 # ]
 
-has_at_least_one_nonzero_reward_during_learn_phase = False
+# has_at_least_one_nonzero_reward_during_learn_phase = False
 
 class FortniteEnv(gym.Env):
     def __init__(self, use_yolo_reward=False):
         super().__init__()
         # possible_actions = [3, 3] + [2]*len(holdable_keys) + [2]*len(pressable_keys) + [3, 3]
-        possible_actions = [3, 3] + [2]*len(holdable_keys) + [3, 3]
+        # possible_actions = [3, 3] + [2]*len(holdable_keys) + [3, 3]
+        # possible_actions = [2]*len(holdable_keys) + [3, 3]
+        possible_actions = [2]*len(holdable_keys) + [5, 5]
         self.action_space = gym.spaces.MultiDiscrete(possible_actions)
         self.observation_space = gym.spaces.Box(low=0, high=255,
                                             shape=(HEIGHT//4, WIDTH//4, N_CHANNELS), dtype=np.uint8)
@@ -77,6 +79,10 @@ class FortniteEnv(gym.Env):
         self.player_killed_opponent_cooldown_period = False
         self.opponent_killed_player_cooldown_period = False
         self.use_yolo_reward = use_yolo_reward
+        self.step_since_last_reset = 0
+
+        self.prev_right_thumb_x = 0
+        self.prev_right_thumb_y = 0
 
     def quarter_sized_screencap_np(self, screencap_img):
         # Image.fromarray(screencap_img).resize((WIDTH//4, HEIGHT//4), Image.Resampling.LANCZOS).show()
@@ -107,26 +113,28 @@ class FortniteEnv(gym.Env):
 
     def step(self, action):
 
-        reward = -1
-        if self.player_killed_opponent_cooldown_period:
-            reward = 0
+        # reward = -1
+        # if self.player_killed_opponent_cooldown_period:
+        #     reward = 0
+        reward = 0
+
         # moved = False
         # if self.cur_step % 3 == 0:
-        for i in range(len(holdable_vertical_move_keys)):
-            if action[0] == i:
-                pyautogui.keyDown(holdable_vertical_move_keys[i])
-                # moved = True
-                # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
-            else:
-                pyautogui.keyUp(holdable_vertical_move_keys[i])
+        # for i in range(len(holdable_vertical_move_keys)):
+        #     if action[0] == i:
+        #         pyautogui.keyDown(holdable_vertical_move_keys[i])
+        #         # moved = True
+        #         # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
+        #     else:
+        #         pyautogui.keyUp(holdable_vertical_move_keys[i])
 
-        for i in range(len(holdable_horizontal_move_keys)):
-            if action[1] == i:
-                pyautogui.keyDown(holdable_horizontal_move_keys[i])
-                # moved = True
-                # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
-            else:
-                pyautogui.keyUp(holdable_horizontal_move_keys[i])
+        # for i in range(len(holdable_horizontal_move_keys)):
+        #     if action[1] == i:
+        #         pyautogui.keyDown(holdable_horizontal_move_keys[i])
+        #         # moved = True
+        #         # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
+        #     else:
+        #         pyautogui.keyUp(holdable_horizontal_move_keys[i])
 
             # for i in range(len(pressable_keys)):
             #     if action[3+i] == 1:
@@ -142,15 +150,20 @@ class FortniteEnv(gym.Env):
         #         # print("pressable_mode_keys press: ", pressable_mode_keys[i])
 
         for i in range(len(holdable_keys)):
-            if action[2+i] == 1:
+            if action[i] == 1:
                 pyautogui.keyDown(holdable_keys[i])
                 # print("holdable_keys down: ", holdable_keys[i])
             else:
                 pyautogui.keyUp(holdable_keys[i])
 
-        right_thumb_x = (action[-2]) - 1
-        right_thumb_y = (action[-1]) - 1
+        # right_thumb_x = min(max(((action[-2]) - 1) * 0.25 + self.prev_right_thumb_x, -1), 1)
+        # right_thumb_y = min(max(((action[-1]) - 1) * 0.25 + self.prev_right_thumb_y, -1), 1)
         # print(f"thumbs {right_thumb_x} {right_thumb_y}")
+        right_thumb_x = (action[-2] - 2)/2
+        right_thumb_y = (action[-1] - 2)/2
+        self.prev_right_thumb_x = right_thumb_x
+        self.prev_right_thumb_y = right_thumb_y
+
         gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=right_thumb_y)        
         gamepad.update()
 
@@ -164,16 +177,17 @@ class FortniteEnv(gym.Env):
             # print(f"step {self.cur_step} player health ocr failed {e}")  
             print(f"step {self.cur_step} screencap fail {e}")  
 
-
+        # print("potential reward: ", -math.log10((self.step_since_last_reset+1)/1000))
         terminated = False
         if player_full_img is not None:
             try:
                 player_killed_opponent_detected = self.elim_detected(player_full_img)
                 if player_killed_opponent_detected == DetectionState.DETECTED_TARGET:
                     if not self.player_killed_opponent_cooldown_period:
-                        reward += 10000
+                        # reward += 2000
+                        reward = max(-math.log10((self.step_since_last_reset+1)/10000), .05)
                         self.player_killed_opponent_cooldown_period = True
-                        print(f"step {self.cur_step} player killed opponent")
+                        print(f"step {self.cur_step} player killed opponent reward {reward}")
                 elif player_killed_opponent_detected == DetectionState.DETECTED_NOTHING:
                     if self.player_killed_opponent_cooldown_period:
                         self.player_killed_opponent_cooldown_period = False
@@ -188,9 +202,10 @@ class FortniteEnv(gym.Env):
                 opponent_killed_player_detected = self.got_killed_detected(player_full_img)
                 if opponent_killed_player_detected == DetectionState.DETECTED_TARGET:
                     if not self.opponent_killed_player_cooldown_period:
-                        reward -= 10000
+                        # reward -= 2000
+                        reward = min(math.log10((self.step_since_last_reset+1)/10000), -.05)
                         self.opponent_killed_player_cooldown_period = True
-                        print(f"step {self.cur_step} opponent killed player")
+                        print(f"step {self.cur_step} opponent killed player punish {reward}")
                 elif opponent_killed_player_detected == DetectionState.DETECTED_NOTHING:
                     if self.opponent_killed_player_cooldown_period:
                         self.opponent_killed_player_cooldown_period = False
@@ -200,25 +215,41 @@ class FortniteEnv(gym.Env):
             except Exception as e:
                 print(f"step {self.cur_step} opponent killed player detect failed {e}")
 
-            if self.use_yolo_reward:
-                try:
-                    objects_detected = yolo_model(player_full_img, verbose=False) #channels inverted but might not matter
-                    found_center = False
-                    for object in objects_detected:
-                        for i in range(len(object.boxes.cls)):
-                            if object.boxes.cls[i] == 0:
-                                dist_to_crosshair = math.sqrt((object.boxes.xywh[i][0] - (WIDTH / 2))**2 + (object.boxes.xywh[i][1] - (HEIGHT / 2))**2)
-                                # print(f"step {self.cur_step} normalized dist_to_crosshair: {dist_to_crosshair/MAX_DISTANCE_TO_CROSSHAIR}")
-                                reward += round((1 - dist_to_crosshair/MAX_DISTANCE_TO_CROSSHAIR) * 100)
-                                found_center = True
-                                break
-                        if found_center:
-                            break
-                    if not found_center:
-                        reward -= 100
+            # if self.use_yolo_reward:
+            #     try:
+            #         objects_detected = yolo_model(player_full_img, verbose=False) #channels inverted but might not matter
+            #         crosshair_over_opponent = False
+            #         for object in objects_detected:
+            #             for i in range(len(object.boxes.cls)):
+            #                 if object.boxes.cls[i] == 0:
+            #                     # dist_to_crosshair = math.sqrt((object.boxes.xywh[i][0] - (WIDTH / 2))**2 + (object.boxes.xywh[i][1] - (HEIGHT / 2))**2)
+            #                     # print(f"step {self.cur_step} normalized dist_to_crosshair: {dist_to_crosshair/MAX_DISTANCE_TO_CROSSHAIR}")
+            #                     # reward += round((1 - dist_to_crosshair/MAX_DISTANCE_TO_CROSSHAIR) * 100)
+            #                     if object.boxes.xywh[i][0] < (WIDTH / 2) and object.boxes.xywh[i][0] + object.boxes.xywh[i][2] > (WIDTH / 2) and object.boxes.xywh[i][1] < (HEIGHT / 2) and object.boxes.xywh[i][1] + object.boxes.xywh[i][3] > (HEIGHT / 2):
+            #                         reward += 11
+            #                         crosshair_over_opponent = True
+            #                         break
+            #             if crosshair_over_opponent:
+            #                 break
+            #         # if not found_center:
+            #         #     reward -= 100
+            #         # objects_detected = yolo_model(player_full_img, verbose=False) #channels inverted but might not matter
+            #         # found_center = False
+            #         # for object in objects_detected:
+            #         #     for i in range(len(object.boxes.cls)):
+            #         #         if object.boxes.cls[i] == 0:
+            #         #             dist_to_crosshair = math.sqrt((object.boxes.xywh[i][0] - (WIDTH / 2))**2 + (object.boxes.xywh[i][1] - (HEIGHT / 2))**2)
+            #         #             # print(f"step {self.cur_step} normalized dist_to_crosshair: {dist_to_crosshair/MAX_DISTANCE_TO_CROSSHAIR}")
+            #         #             reward += round((1 - dist_to_crosshair/MAX_DISTANCE_TO_CROSSHAIR) * 100)
+            #         #             found_center = True
+            #         #             break
+            #         #     if found_center:
+            #         #         break
+            #         # if not found_center:
+            #         #     reward -= 100
                         
-                except Exception as e:
-                    print(f"step {self.cur_step} yolo failed {e}")
+            #     except Exception as e:
+            #         print(f"step {self.cur_step} yolo failed {e}")
 
         
         truncated = False
@@ -227,19 +258,36 @@ class FortniteEnv(gym.Env):
         if player_obs is None:
             player_obs = np.zeros((HEIGHT//4, WIDTH//4, N_CHANNELS), dtype=np.uint8)
 
-        global has_at_least_one_nonzero_reward_during_learn_phase
-        if reward != 0:
-            has_at_least_one_nonzero_reward_during_learn_phase = True
+        # global has_at_least_one_nonzero_reward_during_learn_phase
+        # if reward != 0:
+        #     has_at_least_one_nonzero_reward_during_learn_phase = True
             # print(f"{self.cur_step} reward: ", reward)
 
         self.cur_step += 1
+        self.step_since_last_reset += 1
         return player_obs, reward, terminated, truncated, info
 
     def render(self):
         pass
 
     def reset(self, seed=None, options=None):
-        player_obs = self.quarter_sized_screencap_np(self.cam.grab())
+        print("reset")
+        player_obs = None
+        try:
+            player_obs = self.quarter_sized_screencap_np(self.cam.grab())
+        except:
+            player_obs = np.zeros((HEIGHT//4, WIDTH//4, N_CHANNELS), dtype=np.uint8)
+        self.prev_right_thumb_x = 0
+        self.prev_right_thumb_y = 0
+        gamepad.reset()
+        gamepad.update()
+        # for key in holdable_vertical_move_keys:
+        #     pyautogui.keyUp(key)
+        # for key in holdable_horizontal_move_keys:
+        #     pyautogui.keyUp(key)
+        for key in holdable_keys:
+            pyautogui.keyUp(key)
+        self.step_since_last_reset = 0
         # Image.fromarray(player_obs).show()
         return player_obs, {}
 
@@ -247,10 +295,10 @@ class FortniteEnv(gym.Env):
         print("start cleanup")
         gamepad.reset()
         gamepad.update()
-        for key in holdable_vertical_move_keys:
-            pyautogui.keyUp(key)
-        for key in holdable_horizontal_move_keys:
-            pyautogui.keyUp(key)
+        # for key in holdable_vertical_move_keys:
+        #     pyautogui.keyUp(key)
+        # for key in holdable_horizontal_move_keys:
+        #     pyautogui.keyUp(key)
         for key in holdable_keys:
             pyautogui.keyUp(key)
         print("done cleanup")

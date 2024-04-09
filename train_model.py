@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 import argparse
 import atexit
-from sb3_contrib import RecurrentPPO
+from stable_baselines3 import A2C
+# from sb3_contrib import RecurrentPPO
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.env_util import make_vec_env
 from PIL import Image
@@ -25,9 +26,12 @@ class VecFrameStackSaveOnKill(VecFrameStack):
 
     def step_wait(self):
         self.stackedobs, rewards, dones, infos = super().step_wait()
-        if (abs(rewards[0]) > 9000):
+        if (rewards[0] > 0):
             for i in range(self.n_stack):
                 Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_player_killed_opponent_stacked/step_{self.cur_step}_{i}_player_killed_opponent.png")
+        elif (rewards[0] < 0):
+            for i in range(self.n_stack):
+                Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_opponent_killed_player_stacked/step_{self.cur_step}_{i}_player_killed_opponent.png")
         # else:
         #     for i in range(self.n_stack):
         #         Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/stacked/step_{self.cur_step}_{i}.png")
@@ -41,20 +45,28 @@ if os.path.isfile(checkpoint_path):
     starting_timestep = args.checkpoint_timestep
     env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, env_kwargs={'use_yolo_reward': args.use_yolo_reward}), n_stack=4, starting_timestep=starting_timestep)
     print("loaded model")
-    model = RecurrentPPO.load(checkpoint_path)
+    # model = RecurrentPPO.load(checkpoint_path)
+    model = A2C.load(checkpoint_path)
     model.set_env(env)
 else:
     print("new model")
     env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, env_kwargs={'use_yolo_reward': args.use_yolo_reward}), n_stack=4, starting_timestep=0)
     Path(f'{args.checkpoint_folder}/img_player_killed_opponent_stacked').mkdir(parents=True, exist_ok=True)
-    model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
+    Path(f'{args.checkpoint_folder}/img_opponent_killed_player_stacked').mkdir(parents=True, exist_ok=True)
+    Path(f'{args.checkpoint_folder}/stacked').mkdir(parents=True, exist_ok=True)
+    # model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
+    model = A2C("CnnPolicy", env, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
 
 atexit.register(env.close)
 
 for i in range(100):
-    model = model.learn(total_timesteps=10240, reset_num_timesteps=False)
-    if fortnite_env.has_at_least_one_nonzero_reward_during_learn_phase:
-        checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (10240 * (i+1))}'
-        model.save(checkpoint_name)
-    fortnite_env.has_at_least_one_nonzero_reward_during_learn_phase = False
+    model = model.learn(total_timesteps=10000, reset_num_timesteps=False)
+    # model = model.learn(total_timesteps=10240, reset_num_timesteps=False)
+    # checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (10240 * (i+1))}'
+    checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (10000 * (i+1))}'
+    model.save(checkpoint_name)
+    # if fortnite_env.has_at_least_one_nonzero_reward_during_learn_phase:
+    #     checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (10240 * (i+1))}'
+    #     model.save(checkpoint_name)
+    # fortnite_env.has_at_least_one_nonzero_reward_during_learn_phase = False
 

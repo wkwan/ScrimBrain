@@ -19,5 +19,6 @@ obs = env.reset()
 model = RecurrentPPO.load(args.checkpoint_path)
 
 while True:
-    action, _states = model.predict(obs, deterministic=True)
+    action, _states = model.predict(obs, deterministic=False)
+    print(action)
     obs, reward, dones, info = env.step(action)

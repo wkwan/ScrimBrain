@@ -51,25 +51,25 @@ holdable_keys = [
     'p', #target, reset building edit
 ]
 
-# pressable_keys = [
-#     'space', #jump
-#     'shiftleft', #sprint
-#     'ctrlleft', #crouch/slide
-#     # 'u', #reload
-#     # 'v', #repair/upgrade
-#     # 'r', #rotate
-#     # '9', #change building material
-# ]
+pressable_keys = [
+    'space', #jump
+    'shiftleft', #sprint
+    'ctrlleft', #crouch/slide
+    # 'u', #reload
+    # 'v', #repair/upgrade
+    # 'r', #rotate
+    # '9', #change building material
+]
 
 # has_at_least_one_nonzero_reward_during_learn_phase = False
 
 class FortniteEnv(gym.Env):
     def __init__(self, use_yolo_reward=False):
         super().__init__()
-        # possible_actions = [3, 3] + [2]*len(holdable_keys) + [2]*len(pressable_keys) + [3, 3]
+        possible_actions = [3, 3] + [2]*len(holdable_keys) + [2]*len(pressable_keys) + [5, 5]
         # possible_actions = [3, 3] + [2]*len(holdable_keys) + [3, 3]
         # possible_actions = [2]*len(holdable_keys) + [3, 3]
-        possible_actions = [2]*len(holdable_keys) + [5, 5]
+        # possible_actions = [2]*len(holdable_keys) + [5, 5]
         self.action_space = gym.spaces.MultiDiscrete(possible_actions)
         self.observation_space = gym.spaces.Box(low=0, high=255,
                                             shape=(HEIGHT//4, WIDTH//4, N_CHANNELS), dtype=np.uint8)
@@ -112,6 +112,7 @@ class FortniteEnv(gym.Env):
         return DetectionState.DETECTED_NOTHING
 
     def step(self, action):
+        print(action)
 
         # reward = -1
         # if self.player_killed_opponent_cooldown_period:
@@ -120,26 +121,22 @@ class FortniteEnv(gym.Env):
 
         # moved = False
         # if self.cur_step % 3 == 0:
-        # for i in range(len(holdable_vertical_move_keys)):
-        #     if action[0] == i:
-        #         pyautogui.keyDown(holdable_vertical_move_keys[i])
-        #         # moved = True
-        #         # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
-        #     else:
-        #         pyautogui.keyUp(holdable_vertical_move_keys[i])
+        for i in range(len(holdable_vertical_move_keys)):
+            if action[0] == i:
+                pyautogui.keyDown(holdable_vertical_move_keys[i])
+                # moved = True
+                # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
+            else:
+                pyautogui.keyUp(holdable_vertical_move_keys[i])
 
-        # for i in range(len(holdable_horizontal_move_keys)):
-        #     if action[1] == i:
-        #         pyautogui.keyDown(holdable_horizontal_move_keys[i])
-        #         # moved = True
-        #         # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
-        #     else:
-        #         pyautogui.keyUp(holdable_horizontal_move_keys[i])
+        for i in range(len(holdable_horizontal_move_keys)):
+            if action[1] == i:
+                pyautogui.keyDown(holdable_horizontal_move_keys[i])
+                # moved = True
+                # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
+            else:
+                pyautogui.keyUp(holdable_horizontal_move_keys[i])
 
-            # for i in range(len(pressable_keys)):
-            #     if action[3+i] == 1:
-            #         pyautogui.press(pressable_keys[i])
-            #         # print("pressable_keys press: ", pressable_keys[i])
 
         # if moved:
         #     reward -= 1
@@ -150,11 +147,16 @@ class FortniteEnv(gym.Env):
         #         # print("pressable_mode_keys press: ", pressable_mode_keys[i])
 
         for i in range(len(holdable_keys)):
-            if action[i] == 1:
+            if action[2+i] == 1:
                 pyautogui.keyDown(holdable_keys[i])
                 # print("holdable_keys down: ", holdable_keys[i])
             else:
                 pyautogui.keyUp(holdable_keys[i])
+
+        for i in range(len(pressable_keys)):
+            if action[4+i] == 1:
+                pyautogui.press(pressable_keys[i])
+                # print("pressable_keys press: ", pressable_keys[i])
 
         # right_thumb_x = min(max(((action[-2]) - 1) * 0.25 + self.prev_right_thumb_x, -1), 1)
         # right_thumb_y = min(max(((action[-1]) - 1) * 0.25 + self.prev_right_thumb_y, -1), 1)

@@ -31,7 +31,7 @@ class VecFrameStackSaveOnKill(VecFrameStack):
                 Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_player_killed_opponent_stacked/step_{self.cur_step}_{i}_player_killed_opponent.png")
         elif (rewards[0] < 0):
             for i in range(self.n_stack):
-                Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_opponent_killed_player_stacked/step_{self.cur_step}_{i}_player_killed_opponent.png")
+                Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_opponent_killed_player_stacked/step_{self.cur_step}_{i}_opponent_killed_player.png")
         # else:
         #     for i in range(self.n_stack):
         #         Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/stacked/step_{self.cur_step}_{i}.png")

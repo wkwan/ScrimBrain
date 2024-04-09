@@ -212,7 +212,8 @@ class FortniteEnv(gym.Env):
                     if self.opponent_killed_player_cooldown_period:
                         self.opponent_killed_player_cooldown_period = False
                         print(f"step {self.cur_step} opponent killed player cooldown period terminated episode")
-                        return player_obs, -1, True, False, {}
+                        return player_obs, 0, True, False, {}
+                    
                     self.opponent_killed_player_cooldown_period = False  
             except Exception as e:
                 print(f"step {self.cur_step} opponent killed player detect failed {e}")
@@ -283,10 +284,10 @@ class FortniteEnv(gym.Env):
         self.prev_right_thumb_y = 0
         gamepad.reset()
         gamepad.update()
-        # for key in holdable_vertical_move_keys:
-        #     pyautogui.keyUp(key)
-        # for key in holdable_horizontal_move_keys:
-        #     pyautogui.keyUp(key)
+        for key in holdable_vertical_move_keys:
+            pyautogui.keyUp(key)
+        for key in holdable_horizontal_move_keys:
+            pyautogui.keyUp(key)
         for key in holdable_keys:
             pyautogui.keyUp(key)
         self.step_since_last_reset = 0
@@ -297,10 +298,10 @@ class FortniteEnv(gym.Env):
         print("start cleanup")
         gamepad.reset()
         gamepad.update()
-        # for key in holdable_vertical_move_keys:
-        #     pyautogui.keyUp(key)
-        # for key in holdable_horizontal_move_keys:
-        #     pyautogui.keyUp(key)
+        for key in holdable_vertical_move_keys:
+            pyautogui.keyUp(key)
+        for key in holdable_horizontal_move_keys:
+            pyautogui.keyUp(key)
         for key in holdable_keys:
             pyautogui.keyUp(key)
         print("done cleanup")

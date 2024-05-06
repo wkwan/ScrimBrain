@@ -113,18 +113,12 @@ class FortniteEnv(gym.Env):
 
     def step(self, action):
         # print(action)
-
-        # reward = -1
-        # if self.player_killed_opponent_cooldown_period:
-        #     reward = 0
         reward = 0
 
-        # moved = False
         # if self.cur_step % 3 == 0:
         for i in range(len(holdable_vertical_move_keys)):
             if action[0] == i:
                 pyautogui.keyDown(holdable_vertical_move_keys[i])
-                # moved = True
                 # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
             else:
                 pyautogui.keyUp(holdable_vertical_move_keys[i])
@@ -132,14 +126,9 @@ class FortniteEnv(gym.Env):
         for i in range(len(holdable_horizontal_move_keys)):
             if action[1] == i:
                 pyautogui.keyDown(holdable_horizontal_move_keys[i])
-                # moved = True
                 # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
             else:
                 pyautogui.keyUp(holdable_horizontal_move_keys[i])
-
-
-        # if moved:
-        #     reward -= 1
 
         # for i in range(len(pressable_mode_keys)):
         #     if action[2] == i:

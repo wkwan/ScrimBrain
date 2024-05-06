@@ -1,11 +1,16 @@
 import atexit
+from time import sleep
 
 import pyautogui
 pyautogui.PAUSE = 0
 
-pyautogui.keyDown['o']
+def close():
+    pyautogui.keyUp('o')
 
-def close(self):
-    pyautogui.keyUp['o']
+sleep(3) #get ready
+pyautogui.keyDown('o')
+
+while True:
+    print("hold the wall")
 
 atexit.register(close)

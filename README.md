@@ -17,13 +17,13 @@ Since we can simulate Windows inputs, and also ingest real-time screencapture of
 
 ScrimBrain aims to help competitive gamers of all skill levels improve more efficiently. To do this, we’re building an open-source reinforcement learning framework to train practice bots for games, starting with Fortnite 1v1’s. This is the first reinforcement learning framework targeted to gamers, as opposed to AI researchers.
 
-The current model is trained on this map: https://www.fortnite.com/@necrogames/8136-5511-4930
+The current debugging model is trained on this map: https://www.fortnite.com/@necrogames/8136-5511-4930
 
 The model ingests real-time screen capture and predicts keyboard/mouse inputs to simulate. 
 
 Soon, we’ll be offering model checkpoints trained on different UEFN maps and performing at different skill levels to suit various practice needs.
 
-Although Fortnite wall-stealing will be the first use-case, the system is designed to work with any game that runs on Windows, and we'll be adding extensive documentation to help developers train their own models.
+Although Fortnite wall-stealing will be the first practical use-case, the system is designed to work with any game that runs on Windows, and we'll be adding extensive documentation to help developers train their own models.
 
 ## Setup
 

@@ -23,7 +23,7 @@ The model ingests real-time screen capture and predicts keyboard/mouse inputs to
 
 Soon, we’ll be offering model checkpoints trained on different UEFN maps and performing at different skill levels to suit various practice needs.
 
-Although Fortnite is the first use-case, the system is designed to work with any game that runs on Windows, and we'll be adding extensive documentation to help developers train their own models.
+Although Fortnite wall-stealing will be the first use-case, the system is designed to work with any game that runs on Windows, and we'll be adding extensive documentation to help developers train their own models.
 
 ## Setup
 

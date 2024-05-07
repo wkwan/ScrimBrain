@@ -5,6 +5,9 @@ import atexit
 from stable_baselines3 import A2C
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.env_util import make_vec_env
+from PIL import Image
+from pathlib import Path
+import numpy as np
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser()
@@ -41,13 +44,20 @@ for i in range(num_steps):
     action, _states = model.predict(obs, deterministic=True)
     obs, reward, dones, info = env.step(action)
 
+
+Path("activations").mkdir(exist_ok=True)
+
+
+plt.ioff()
+
 for i in range(len(activations_list)):
     # TODO: do we need to normalize?
     # activations_list[i] -= activations_list[i].min()
     # activations_list[i] /= activations_list[i].max()
 
-    plt.figure(figsize=(8, 8))
-    plt.imshow(activations_list[i][0]) # TODO: confirm if this is the correct way to visualize the CNN filters. If it is, then visualize all of them in a grid.
-    print(activations_list[i][0])
-    plt.axis('off')
-    plt.show()
+    for j in range(activations_list[i].shape[0]):
+        print(activations_list[i][j].shape)
+        plt.imshow(activations_list[i][j], cmap='Greys_r')
+        # plt.show()
+        plt.axis('off')
+        plt.savefig(f'activations/activation_step_{i}_filter_{j}.png', bbox_inches='tight',transparent=True, pad_inches=0)

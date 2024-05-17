@@ -35,6 +35,10 @@ It should work best using the same map and skins shown in the demo, but it isn't
 
 Setup your keybinds to match the training environment keybinds in [fortnite_env.py](fortnite_env.py)
 
+Fullscreen Fortnite at 1920x1080 on your main monitor.
+
+Load into the map (**1V1, 1 HP, 1X1 BOX** 8136-5511-4930).
+
 ```
 conda env create -f environment.yml
 conda activate scrimbrain

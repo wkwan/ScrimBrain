@@ -10,7 +10,7 @@ The very simple script to hold the wall (or other build piece) is [hold_wall.py]
 
 Instructions:
 1. Run Fortnite on a second PC.
-2. Change the keybind in [hold_wall.py](hold_wall.py) from 'o' to whatever your keybind is for wall.
+2. Change the keybind in [hold_wall.py](hold_wall.py) from 'o' to whatever your keybind is for "Place Build".
 3. Walk the player on your second PC behind the wall you want to hold and take out your wall.
 4. From there, running the script simply holds the keybind to place the wall and you can practice the wall stealing mechanic on your main PC.
 

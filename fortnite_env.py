@@ -89,7 +89,7 @@ class FortniteEnv(gym.Env):
         return np.array(Image.fromarray(screencap_img).resize((WIDTH//4, HEIGHT//4), Image.Resampling.LANCZOS))
     
     def elim_detected(self, full_img):
-        elim_ocr = self.reader.readtext(full_img[660:690, 810:965], detail=0)
+        elim_ocr = self.reader.readtext(full_img[655:685, 650:800], detail=0)
         # print("elim ocr: ", elim_ocr)
         if (len(elim_ocr) > 0):
             for i in range(len(elim_ocr)):

@@ -155,7 +155,8 @@ class FortniteEnv(gym.Env):
         self.prev_right_thumb_x = right_thumb_x
         self.prev_right_thumb_y = right_thumb_y
 
-        gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=right_thumb_y)        
+        # gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=right_thumb_y)
+        gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=0)
         gamepad.update()
 
         
@@ -206,6 +207,15 @@ class FortniteEnv(gym.Env):
                     self.opponent_killed_player_cooldown_period = False  
             except Exception as e:
                 print(f"step {self.cur_step} opponent killed player detect failed {e}")
+
+            try:
+                feet_location = pyautogui.locateOnScreen('media/feet.png', confidence=0.6)
+                if ((feet_location.top  + feet_location.height / 2) > HEIGHT / 2):
+                    reward -= 0.01
+            except Exception as e:
+                pass
+                # print(f"step {self.cur_step} feet detection failed {e}")
+              
 
             # if self.use_yolo_reward:
             #     try:

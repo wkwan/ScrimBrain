@@ -60,10 +60,10 @@ else:
 atexit.register(env.close)
 
 for i in range(100):
-    model = model.learn(total_timesteps=10000, reset_num_timesteps=False)
+    model = model.learn(total_timesteps=25000, reset_num_timesteps=False)
     # model = model.learn(total_timesteps=10240, reset_num_timesteps=False)
     # checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (10240 * (i+1))}'
-    checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (10000 * (i+1))}'
+    checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (25000 * (i+1))}'
     model.save(checkpoint_name)
     # if fortnite_env.has_at_least_one_nonzero_reward_during_learn_phase:
     #     checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (10240 * (i+1))}'

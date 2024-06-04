@@ -84,6 +84,10 @@ class FortniteEnv(gym.Env):
         self.prev_right_thumb_x = 0
         self.prev_right_thumb_y = 0
 
+        self.score = 0
+        self.last_step_killcount = 0
+        self.score_detected_cooldown_period = False
+
     def quarter_sized_screencap_np(self, screencap_img):
         # Image.fromarray(screencap_img).resize((WIDTH//4, HEIGHT//4), Image.Resampling.LANCZOS).show()
         return np.array(Image.fromarray(screencap_img).resize((WIDTH//4, HEIGHT//4), Image.Resampling.LANCZOS))
@@ -99,7 +103,19 @@ class FortniteEnv(gym.Env):
             return DetectionState.DETECTED_OTHER
         return DetectionState.DETECTED_NOTHING
     
-    # hardcoded to the player name and thhe width of of the player name
+
+    def score_detected(self, full_img):
+        elim_ocr = self.reader.readtext(full_img[415:455, 975:1115], detail=0)
+        # print("score detected ocr: ", elim_ocr)
+        if (len(elim_ocr) > 0):
+            for i in range(len(elim_ocr)):
+                elim_match_ratio = SequenceMatcher(None, elim_ocr[i], "SCORE").ratio()
+                if (elim_match_ratio > 0.7):
+                    return DetectionState.DETECTED_TARGET
+            return DetectionState.DETECTED_OTHER
+        return DetectionState.DETECTED_NOTHING
+    
+    # hardcoded to the player name and the width of of the player name
     def got_killed_detected(self, full_img):
         elim_ocr = self.reader.readtext(full_img[610:640, 25:115], detail=0)
         # print("got killed detected ocr: ", elim_ocr)
@@ -110,6 +126,26 @@ class FortniteEnv(gym.Env):
                     return DetectionState.DETECTED_TARGET
             return DetectionState.DETECTED_OTHER
         return DetectionState.DETECTED_NOTHING
+    
+    def got_killed_by_guard_detected(self, full_img):
+        elim_ocr = self.reader.readtext(full_img[615:645, 30:115], detail=0)
+        # print("got killed detected ocr: ", elim_ocr)
+        if (len(elim_ocr) > 0):
+            for i in range(len(elim_ocr)):
+                elim_match_ratio = SequenceMatcher(None, elim_ocr[i], "Guard").ratio()
+                if (elim_match_ratio > 0.7):
+                    return DetectionState.DETECTED_TARGET
+            return DetectionState.DETECTED_OTHER
+        return DetectionState.DETECTED_NOTHING
+    
+    def killcount(self, full_img):
+        killcount_ocr = self.reader.readtext(full_img[80:115, 790:890], detail=0)
+        # print("got killed detected ocr: ", elim_ocr)
+        if (len(killcount_ocr) > 0):
+            # print("killcount: ", elim_ocr)
+            for i in range(len(killcount_ocr)):
+                if (killcount_ocr[i].isdigit()):
+                    return int(killcount_ocr[i])
 
     def step(self, action):
         # print(action)
@@ -172,30 +208,61 @@ class FortniteEnv(gym.Env):
         # print("potential reward: ", -math.log10((self.step_since_last_reset+1)/1000))
         terminated = False
         if player_full_img is not None:
-            try:
-                player_killed_opponent_detected = self.elim_detected(player_full_img)
-                if player_killed_opponent_detected == DetectionState.DETECTED_TARGET:
-                    if not self.player_killed_opponent_cooldown_period:
-                        # reward += 2000
-                        reward = max(-math.log10((self.step_since_last_reset+1)/10000), .05)
-                        self.player_killed_opponent_cooldown_period = True
-                        print(f"step {self.cur_step} player killed opponent reward {reward}")
-                elif player_killed_opponent_detected == DetectionState.DETECTED_NOTHING:
-                    if self.player_killed_opponent_cooldown_period:
-                        self.player_killed_opponent_cooldown_period = False
-                        print(f"step {self.cur_step} player killed opponent cooldown period terminated episode")
-                        return player_obs, 0, True, False, {}
+            # try:
+            #     player_killed_opponent_detected = self.elim_detected(player_full_img)
+            #     if player_killed_opponent_detected == DetectionState.DETECTED_TARGET:
+            #         if not self.player_killed_opponent_cooldown_period:
+            #             # reward += 2000
+            #             reward = max(-math.log10((self.step_since_last_reset+1)/10000), .05)
+            #             self.player_killed_opponent_cooldown_period = True
+            #             print(f"step {self.cur_step} player killed opponent reward {reward}")
+            #     elif player_killed_opponent_detected == DetectionState.DETECTED_NOTHING:
+            #         if self.player_killed_opponent_cooldown_period:
+            #             self.player_killed_opponent_cooldown_period = False
+            #             print(f"step {self.cur_step} player killed opponent cooldown period terminated episode")
+            #             return player_obs, 0, True, False, {}
     
-                    self.player_killed_opponent_cooldown_period = False  
-            except Exception as e:
-                print(f"step {self.cur_step} player elim detect failed {e}")
+            #         self.player_killed_opponent_cooldown_period = False  
+            # except Exception as e:
+            #     print(f"step {self.cur_step} player elim detect failed {e}")
 
             try:
-                opponent_killed_player_detected = self.got_killed_detected(player_full_img)
+                score_detected = self.score_detected(player_full_img)
+                if score_detected == DetectionState.DETECTED_TARGET:
+                    if not self.score_detected_cooldown_period:
+                        reward += 1
+                        self.score_detected_cooldown_period = True
+                        print(f"step {self.cur_step} score detected add one {reward}")
+                elif score_detected == DetectionState.DETECTED_NOTHING:
+                    self.score_detected_cooldown_period = False  
+            except Exception as e:
+                print(f"step {self.cur_step} score detect detect failed {e}")
+
+            # try:
+            #     killcount_ocr = self.killcount(player_full_img)
+            #     if (killcount_ocr is not None):
+            #         # print('have killcount', killcount_ocr)
+            #         if (killcount_ocr > self.score and killcount_ocr < self.score + 5):
+            #             reward = killcount_ocr - self.score
+            #             print(f"step {self.cur_step} killcount reward {reward}")
+            #             self.score = killcount_ocr
+            #         if (killcount_ocr == self.last_step_killcount):
+            #             print("killcount ocr same as last step {killcount_ocr}")
+            #             self.score = killcount_ocr
+            #         self.last_step_killcount = killcount_ocr
+
+            # except Exception as e:
+            #     print(f"step {self.cur_step} killcount ocr failed {e}")
+
+            try:
+                # opponent_killed_player_detected = self.got_killed_detected(player_full_img)
+                opponent_killed_player_detected = self.got_killed_by_guard_detected(player_full_img)
+
                 if opponent_killed_player_detected == DetectionState.DETECTED_TARGET:
                     if not self.opponent_killed_player_cooldown_period:
                         # reward -= 2000
-                        reward = min(math.log10((self.step_since_last_reset+1)/10000), -.05)
+                        # reward = min(math.log10((self.step_since_last_reset+1)/10000), -.05)
+                        reward -= 10
                         self.opponent_killed_player_cooldown_period = True
                         print(f"step {self.cur_step} opponent killed player punish {reward}")
                 elif opponent_killed_player_detected == DetectionState.DETECTED_NOTHING:
@@ -208,14 +275,14 @@ class FortniteEnv(gym.Env):
             except Exception as e:
                 print(f"step {self.cur_step} opponent killed player detect failed {e}")
 
-            try:
-                feet_location = pyautogui.locateOnScreen('media/feet.png', confidence=0.6)
-                if ((feet_location.top  + feet_location.height / 2) > HEIGHT / 2):
-                    reward -= 0.01
-            except Exception as e:
-                pass
-                # print(f"step {self.cur_step} feet detection failed {e}")
-              
+            # try:
+            #     feet_location = pyautogui.locateOnScreen('media/feet.png', confidence=0.6)
+            #     if ((feet_location.top  + feet_location.height / 2) > HEIGHT / 2):
+            #         reward -= 0.01
+            #         print("punish for feet")
+            # except Exception as e:
+            #     pass
+            #     # print(f"step {self.cur_step} feet detection failed {e}")
 
             # if self.use_yolo_reward:
             #     try:

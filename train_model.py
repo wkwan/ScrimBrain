@@ -45,8 +45,8 @@ if os.path.isfile(checkpoint_path):
     starting_timestep = args.checkpoint_timestep
     env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, env_kwargs={'use_yolo_reward': args.use_yolo_reward}), n_stack=4, starting_timestep=starting_timestep)
     print("loaded model")
-    # model = RecurrentPPO.load(checkpoint_path)
-    model = A2C.load(checkpoint_path)
+    model = RecurrentPPO.load(checkpoint_path)
+    # model = A2C.load(checkpoint_path)
     model.set_env(env)
 else:
     print("new model")

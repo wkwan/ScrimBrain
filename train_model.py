@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 import argparse
 import atexit
-from stable_baselines3 import A2C
-# from sb3_contrib import RecurrentPPO
+# from stable_baselines3 import A2C
+from sb3_contrib import RecurrentPPO
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.env_util import make_vec_env
 from PIL import Image
@@ -54,8 +54,8 @@ else:
     Path(f'{args.checkpoint_folder}/img_player_killed_opponent_stacked').mkdir(parents=True, exist_ok=True)
     Path(f'{args.checkpoint_folder}/img_opponent_killed_player_stacked').mkdir(parents=True, exist_ok=True)
     Path(f'{args.checkpoint_folder}/stacked').mkdir(parents=True, exist_ok=True)
-    # model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
-    model = A2C("CnnPolicy", env, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
+    model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
+    # model = A2C("CnnPolicy", env, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
 
 atexit.register(env.close)
 

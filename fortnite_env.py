@@ -230,9 +230,9 @@ class FortniteEnv(gym.Env):
                 score_detected = self.score_detected(player_full_img)
                 if score_detected == DetectionState.DETECTED_TARGET:
                     if not self.score_detected_cooldown_period:
-                        reward += 1
+                        reward += 5
                         self.score_detected_cooldown_period = True
-                        print(f"step {self.cur_step} score detected add one {reward}")
+                        print(f"step {self.cur_step} score detected add five {reward}")
                 elif score_detected == DetectionState.DETECTED_NOTHING:
                     self.score_detected_cooldown_period = False  
             except Exception as e:
@@ -275,14 +275,15 @@ class FortniteEnv(gym.Env):
             except Exception as e:
                 print(f"step {self.cur_step} opponent killed player detect failed {e}")
 
-            # try:
-            #     feet_location = pyautogui.locateOnScreen('media/feet.png', confidence=0.6)
-            #     if ((feet_location.top  + feet_location.height / 2) > HEIGHT / 2):
-            #         reward -= 0.01
-            #         print("punish for feet")
-            # except Exception as e:
-            #     pass
-            #     # print(f"step {self.cur_step} feet detection failed {e}")
+            try:
+                feet_location = pyautogui.locateOnScreen('media/feet.png', confidence=0.6)
+                if ((feet_location.top  + feet_location.height / 2) < HEIGHT / 2):
+                    reward += 0.02
+                    # print("punish for feet")
+                    print("reward for feet")
+            except Exception as e:
+                pass
+                # print(f"step {self.cur_step} feet detection failed {e}")
 
             # if self.use_yolo_reward:
             #     try:

@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 import argparse
 import atexit
-# from stable_baselines3 import A2C
-from sb3_contrib import RecurrentPPO
+from stable_baselines3 import A2C
+# from sb3_contrib import RecurrentPPO
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.env_util import make_vec_env
 from PIL import Image
@@ -45,8 +45,8 @@ if os.path.isfile(checkpoint_path):
     starting_timestep = args.checkpoint_timestep
     env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, env_kwargs={'use_yolo_reward': args.use_yolo_reward}), n_stack=4, starting_timestep=starting_timestep)
     print("loaded model")
-    model = RecurrentPPO.load(checkpoint_path)
-    # model = A2C.load(checkpoint_path)
+    # model = RecurrentPPO.load(checkpoint_path)
+    model = A2C.load(checkpoint_path)
     model.set_env(env)
 else:
     print("new model")
@@ -54,8 +54,8 @@ else:
     Path(f'{args.checkpoint_folder}/img_player_killed_opponent_stacked').mkdir(parents=True, exist_ok=True)
     Path(f'{args.checkpoint_folder}/img_opponent_killed_player_stacked').mkdir(parents=True, exist_ok=True)
     Path(f'{args.checkpoint_folder}/stacked').mkdir(parents=True, exist_ok=True)
-    model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
-    # model = A2C("CnnPolicy", env, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
+    # model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
+    model = A2C("CnnPolicy", env, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
 
 atexit.register(env.close)
 

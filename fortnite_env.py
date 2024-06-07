@@ -11,6 +11,7 @@ import pyautogui
 pyautogui.PAUSE = 0
 
 import vgamepad as vg
+import time
 gamepad = vg.VX360Gamepad()
 
 # from ultralytics import YOLO
@@ -148,7 +149,28 @@ class FortniteEnv(gym.Env):
                     return int(killcount_ocr[i])
 
     def step(self, action):
-        # print(action)
+
+        if (self.cur_step % 10000 == 0):
+            print("check if we need to reenter the game")
+            try:
+                back_button_location = pyautogui.locateOnScreen('media/level-up.png')
+                pyautogui.press('esc')
+                print(f"level up screen detected, pressed esc, now sleep for 15s")
+                time.sleep(15)
+                print("done sleeping after pressing esc")
+            except Exception as e:
+                print("level up not found")
+
+            try:
+                play_button_location = pyautogui.locateOnScreen('media/play-button.png')
+                pyautogui.click(pyautogui.center(play_button_location))
+                print(f"clicked play butto at {play_button_location}, now sleep for 60s")
+                time.sleep(30)
+                print("done sleeping after clicking play button")
+            except Exception as e:
+                print("play button not found")
+
+                # print(action)
         reward = 0
 
         # if self.cur_step % 3 == 0:

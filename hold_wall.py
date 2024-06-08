@@ -11,6 +11,6 @@ sleep(3) #get ready
 pyautogui.keyDown('o')
 
 while True:
-    print("hold the wall")
+    print("hodor")
 
 atexit.register(close)

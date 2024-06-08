@@ -20,6 +20,8 @@ gamepad = vg.VX360Gamepad()
 N_CHANNELS = 3
 HEIGHT = 1080
 WIDTH = 1920
+
+RESIZE_FACTOR = 8
 # MAX_Y_DIST_TO_CROSSHAIR = HEIGHT/2
 MAX_DISTANCE_TO_CROSSHAIR = math.sqrt((HEIGHT/2) ** 2 + (WIDTH/2) **2)
 
@@ -67,13 +69,19 @@ pressable_keys = [
 class FortniteEnv(gym.Env):
     def __init__(self, use_yolo_reward=False):
         super().__init__()
-        possible_actions = [3, 3] + [2]*len(holdable_keys) + [2]*len(pressable_keys) + [5, 5]
+        # possible_actions = [3, 3] + [2]*len(holdable_keys) + [2]*len(pressable_keys) + [5, 5]
+
+
         # possible_actions = [3, 3] + [2]*len(holdable_keys) + [3, 3]
         # possible_actions = [2]*len(holdable_keys) + [3, 3]
         # possible_actions = [2]*len(holdable_keys) + [5, 5]
-        self.action_space = gym.spaces.MultiDiscrete(possible_actions)
+        # self.action_space = gym.spaces.MultiDiscrete(possible_actions)
+        # self.action_space = gym.spaces.Discrete(50)
+        # self.action_space = gym.spaces.Discrete(10)
+        self.action_space = gym.spaces.Discrete(40)
+        
         self.observation_space = gym.spaces.Box(low=0, high=255,
-                                            shape=(HEIGHT//4, WIDTH//4, N_CHANNELS), dtype=np.uint8)
+                                            shape=(HEIGHT//RESIZE_FACTOR, WIDTH//RESIZE_FACTOR, N_CHANNELS), dtype=np.uint8)
         self.cam = dxcam.create(output_idx=0)
         self.reader = easyocr.Reader(['en'])
         self.cur_step = 0
@@ -90,8 +98,8 @@ class FortniteEnv(gym.Env):
         self.score_detected_cooldown_period = False
 
     def quarter_sized_screencap_np(self, screencap_img):
-        # Image.fromarray(screencap_img).resize((WIDTH//4, HEIGHT//4), Image.Resampling.LANCZOS).show()
-        return np.array(Image.fromarray(screencap_img).resize((WIDTH//4, HEIGHT//4), Image.Resampling.LANCZOS))
+        # Image.fromarray(screencap_img).resize((WIDTH//RESIZE_FACTOR, HEIGHT//RESIZE_FACTOR), Image.Resampling.LANCZOS).show()
+        return np.array(Image.fromarray(screencap_img).resize((WIDTH//RESIZE_FACTOR, HEIGHT//RESIZE_FACTOR), Image.Resampling.LANCZOS))
     
     def elim_detected(self, full_img):
         elim_ocr = self.reader.readtext(full_img[655:685, 650:800], detail=0)
@@ -173,48 +181,115 @@ class FortniteEnv(gym.Env):
                 # print(action)
         reward = 0
 
-        # if self.cur_step % 3 == 0:
-        for i in range(len(holdable_vertical_move_keys)):
-            if action[0] == i:
-                pyautogui.keyDown(holdable_vertical_move_keys[i])
-                # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
-            else:
-                pyautogui.keyUp(holdable_vertical_move_keys[i])
+        # # if self.cur_step % 3 == 0:
+        # for i in range(len(holdable_vertical_move_keys)):
+        #     if action[0] == i:
+        #         pyautogui.keyDown(holdable_vertical_move_keys[i])
+        #         # print("holdable_vertical_move_keys down: ", holdable_vertical_move_keys[i])
+        #     else:
+        #         pyautogui.keyUp(holdable_vertical_move_keys[i])
 
-        for i in range(len(holdable_horizontal_move_keys)):
-            if action[1] == i:
-                pyautogui.keyDown(holdable_horizontal_move_keys[i])
-                # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
-            else:
-                pyautogui.keyUp(holdable_horizontal_move_keys[i])
+        # for i in range(len(holdable_horizontal_move_keys)):
+        #     if action[1] == i:
+        #         pyautogui.keyDown(holdable_horizontal_move_keys[i])
+        #         # print("holdable_horizontal_move_keys down: ", holdable_horizontal_move_keys[i])
+        #     else:
+        #         pyautogui.keyUp(holdable_horizontal_move_keys[i])
 
-        # for i in range(len(pressable_mode_keys)):
-        #     if action[2] == i:
-        #         pyautogui.press(pressable_mode_keys[i])
-        #         # print("pressable_mode_keys press: ", pressable_mode_keys[i])
+        # # for i in range(len(pressable_mode_keys)):
+        # #     if action[2] == i:
+        # #         pyautogui.press(pressable_mode_keys[i])
+        # #         # print("pressable_mode_keys press: ", pressable_mode_keys[i])
 
-        for i in range(len(holdable_keys)):
-            if action[2+i] == 1:
-                pyautogui.keyDown(holdable_keys[i])
-                # print("holdable_keys down: ", holdable_keys[i])
-            else:
-                pyautogui.keyUp(holdable_keys[i])
+        # for i in range(len(holdable_keys)):
+        #     if action[2+i] == 1:
+        #         pyautogui.keyDown(holdable_keys[i])
+        #         # print("holdable_keys down: ", holdable_keys[i])
+        #     else:
+        #         pyautogui.keyUp(holdable_keys[i])
 
-        for i in range(len(pressable_keys)):
-            if action[4+i] == 1:
-                pyautogui.press(pressable_keys[i])
-                # print("pressable_keys press: ", pressable_keys[i])
+        # for i in range(len(pressable_keys)):
+        #     if action[4+i] == 1:
+        #         pyautogui.press(pressable_keys[i])
+        #         # print("pressable_keys press: ", pressable_keys[i])
 
-        # right_thumb_x = min(max(((action[-2]) - 1) * 0.25 + self.prev_right_thumb_x, -1), 1)
-        # right_thumb_y = min(max(((action[-1]) - 1) * 0.25 + self.prev_right_thumb_y, -1), 1)
-        # print(f"thumbs {right_thumb_x} {right_thumb_y}")
-        right_thumb_x = (action[-2] - 2)/2
-        right_thumb_y = (action[-1] - 2)/2
-        self.prev_right_thumb_x = right_thumb_x
-        self.prev_right_thumb_y = right_thumb_y
+        # # right_thumb_x = min(max(((action[-2]) - 1) * 0.25 + self.prev_right_thumb_x, -1), 1)
+        # # right_thumb_y = min(max(((action[-1]) - 1) * 0.25 + self.prev_right_thumb_y, -1), 1)
+        # # print(f"thumbs {right_thumb_x} {right_thumb_y}")
+        # right_thumb_x = (action[-2] - 2)/2
+        # right_thumb_y = (action[-1] - 2)/2
+        # self.prev_right_thumb_x = right_thumb_x
+        # self.prev_right_thumb_y = right_thumb_y
 
-        # gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=right_thumb_y)
-        gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=0)
+        # print("action: ", action)
+
+
+
+        # match action % 5:
+        #     case 0:
+        #         right_thumb_x = -1
+        #     case 1:
+        #         right_thumb_x = -0.5
+        #     case 2:
+        #         right_thumb_x = 0
+        #     case 3:
+        #         right_thumb_x = 0.5
+        #     case 4:
+        #         right_thumb_x = 1
+
+        # match action // 5:
+        #     case 0:
+        #         right_thumb_y = -1
+        #     case 1:
+        #         right_thumb_y = -0.5
+        #     case 2: 
+        #         right_thumb_y = 0
+        #     case 3:
+        #         right_thumb_y = 0.5
+        #     case 4:
+        #         right_thumb_y = 1
+
+        # if (action > 24):
+        #     pyautogui.keyDown('o')
+        #     action -= 25
+        # else:
+        #     pyautogui.keyUp('o')
+
+        right_thumb_x = 0
+        right_thumb_y = 0            
+
+        if (action > 19):
+            pyautogui.keyDown('o')
+            # print("o down")
+            action -= 20
+        else:
+            pyautogui.keyUp('o')
+
+        if (action > 9):
+            pyautogui.keyDown('space')
+            # print("space down")
+            action -= 10
+        else:
+            pyautogui.keyUp('space')
+
+        if (action > 4):
+            pyautogui.keyDown('ctrlleft')
+            # print("ctrlleft down")
+            action -= 5
+
+        match action:
+            case 0:
+                right_thumb_x = -1
+            case 1:
+                right_thumb_x = -0.5
+            case 2:
+                right_thumb_x = 0
+            case 3:
+                right_thumb_x = 0.5
+            case 4:
+                right_thumb_x = 1
+        print("right_thumb_x: ", right_thumb_x)                
+        gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=right_thumb_y)
         gamepad.update()
 
         
@@ -348,7 +423,7 @@ class FortniteEnv(gym.Env):
         info = {}
 
         if player_obs is None:
-            player_obs = np.zeros((HEIGHT//4, WIDTH//4, N_CHANNELS), dtype=np.uint8)
+            player_obs = np.zeros((HEIGHT//RESIZE_FACTOR, WIDTH//RESIZE_FACTOR, N_CHANNELS), dtype=np.uint8)
 
         # global has_at_least_one_nonzero_reward_during_learn_phase
         # if reward != 0:
@@ -368,7 +443,7 @@ class FortniteEnv(gym.Env):
         try:
             player_obs = self.quarter_sized_screencap_np(self.cam.grab())
         except:
-            player_obs = np.zeros((HEIGHT//4, WIDTH//4, N_CHANNELS), dtype=np.uint8)
+            player_obs = np.zeros((HEIGHT//RESIZE_FACTOR, WIDTH//RESIZE_FACTOR, N_CHANNELS), dtype=np.uint8)
         self.prev_right_thumb_x = 0
         self.prev_right_thumb_y = 0
         gamepad.reset()

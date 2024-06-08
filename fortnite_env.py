@@ -260,22 +260,24 @@ class FortniteEnv(gym.Env):
 
         if (action > 19):
             pyautogui.keyDown('o')
-            # print("o down")
+            print("shoot")
             action -= 20
         else:
             pyautogui.keyUp('o')
 
         if (action > 9):
             pyautogui.keyDown('space')
-            # print("space down")
+            print("jump")
             action -= 10
         else:
             pyautogui.keyUp('space')
 
         if (action > 4):
             pyautogui.keyDown('ctrlleft')
-            # print("ctrlleft down")
+            print("crouch")
             action -= 5
+        else:
+            pyautogui.keyUp('ctrlleft')
 
         match action:
             case 0:

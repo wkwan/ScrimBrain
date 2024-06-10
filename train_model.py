@@ -34,10 +34,13 @@ class VecFrameStackSaveOnKill(VecFrameStack):
         self.stackedobs, rewards, dones, infos = super().step_wait()
         if (rewards[0] > 0):
             for i in range(self.n_stack):
-                Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_player_killed_opponent_stacked/step_{self.cur_step}_{i}_player_killed_opponent.png")
-        elif (rewards[0] < -0.02):
-            for i in range(self.n_stack):
-                Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_opponent_killed_player_stacked/step_{self.cur_step}_{i}_opponent_killed_player.png")
+                Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_score/step_{self.cur_step}_{i}_score.png")
+        # if (rewards[0] > 0):
+        #     for i in range(self.n_stack):
+        #         Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_player_killed_opponent_stacked/step_{self.cur_step}_{i}_player_killed_opponent.png")
+        # elif (rewards[0] < -0.02):
+        #     for i in range(self.n_stack):
+        #         Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/img_opponent_killed_player_stacked/step_{self.cur_step}_{i}_opponent_killed_player.png")
         # else:
         #     for i in range(self.n_stack):
         #         Image.fromarray(self.stackedobs[0,:,:,i*3:i*3+3]).save(f"{args.checkpoint_folder}/stacked/step_{self.cur_step}_{i}.png")
@@ -59,9 +62,10 @@ if os.path.isfile(checkpoint_path):
 else:
     print("new model")
     env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, env_kwargs={'use_yolo_reward': args.use_yolo_reward}), n_stack=4, starting_timestep=0)
-    Path(f'{args.checkpoint_folder}/img_player_killed_opponent_stacked').mkdir(parents=True, exist_ok=True)
-    Path(f'{args.checkpoint_folder}/img_opponent_killed_player_stacked').mkdir(parents=True, exist_ok=True)
-    Path(f'{args.checkpoint_folder}/stacked').mkdir(parents=True, exist_ok=True)
+    # Path(f'{args.checkpoint_folder}/img_player_killed_opponent_stacked').mkdir(parents=True, exist_ok=True)
+    # Path(f'{args.checkpoint_folder}/img_opponent_killed_player_stacked').mkdir(parents=True, exist_ok=True)
+    # Path(f'{args.checkpoint_folder}/stacked').mkdir(parents=True, exist_ok=True)
+    Path(f'{args.checkpoint_folder}/img_score').mkdir(parents=True, exist_ok=True)
     # model = RecurrentPPO("CnnLstmPolicy", env, n_steps=2048, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
     # model = A2C("CnnPolicy", env, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
     model = DQN("CnnPolicy", env, buffer_size=20000, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
@@ -82,28 +86,27 @@ plt.ioff()
 
 
 for i in range(1000):
-    model = model.learn(total_timesteps=20000, reset_num_timesteps=False)
-    obs = env.reset()
+    model = model.learn(total_timesteps=50000, reset_num_timesteps=False)
 
-    module_activations = model.policy.features_extractor.cnn[0]
-    forward_hook = module_activations.register_forward_hook(get_values(module_activations))
-    action, _states = model.predict(obs, deterministic=True)
-    forward_hook.remove()
+    # obs = env.reset()
+    # module_activations = model.policy.features_extractor.cnn[0]
+    # forward_hook = module_activations.register_forward_hook(get_values(module_activations))
+    # action, _states = model.predict(obs, deterministic=True)
+    # forward_hook.remove()
 
-    for j in range(len(activations_list)):
+    # for j in range(len(activations_list)):
 
-        for k in range(activations_list[j].shape[0]):
-            print(activations_list[j][k].shape)
-            plt.imshow(activations_list[j][k], cmap='Greys_r')
-            # plt.show()
-            plt.axis('off')
-            # plt.savefig(f'activations/dqn_activation_step_{j * 10}_filter_{k}.png', bbox_inches='tight',transparent=True, pad_inches=0)
-            print("save one activation image")
-            plt.savefig(f'activations/test.png', bbox_inches='tight',transparent=True, pad_inches=0)
-            break
-
-    activations_list.clear()
-    checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (20000 * (i+1))}'
+    #     for k in range(activations_list[j].shape[0]):
+    #         print(activations_list[j][k].shape)
+    #         plt.imshow(activations_list[j][k], cmap='Greys_r')
+    #         # plt.show()
+    #         plt.axis('off')
+    #         # plt.savefig(f'activations/dqn_activation_step_{j * 10}_filter_{k}.png', bbox_inches='tight',transparent=True, pad_inches=0)
+    #         print("save one activation image")
+    #         plt.savefig(f'activations/test.png', bbox_inches='tight',transparent=True, pad_inches=0)
+    #         break
+    # activations_list.clear()
+    checkpoint_name = f'{args.checkpoint_folder}/{starting_timestep + (50000 * (i+1))}'
     model.save(checkpoint_name)
 
     # if fortnite_env.has_at_least_one_nonzero_reward_during_learn_phase:

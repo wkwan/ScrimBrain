@@ -40,29 +40,29 @@ holdable_horizontal_move_keys = [
     'd' #right
 ]
 
-# pressable_mode_keys = [
-#     'e', #assault rifle"
-#     # 'k', #wall
-#     'f', #floor
-#     'l', #stairs
-#     '1', #roof
-#     'g' #edit
+# # pressable_mode_keys = [
+# #     'e', #assault rifle"
+# #     # 'k', #wall
+# #     'f', #floor
+# #     'l', #stairs
+# #     '1', #roof
+# #     'g' #edit
+# # ]
+
+# holdable_keys = [
+#     'o', #fire, place building, select building edit
+#     'p', #target, reset building edit
 # ]
 
-holdable_keys = [
-    'o', #fire, place building, select building edit
-    'p', #target, reset building edit
-]
-
-pressable_keys = [
-    'space', #jump
-    'shiftleft', #sprint
-    'ctrlleft', #crouch/slide
-    # 'u', #reload
-    # 'v', #repair/upgrade
-    # 'r', #rotate
-    # '9', #change building material
-]
+# pressable_keys = [
+#     'space', #jump
+#     'shiftleft', #sprint
+#     'ctrlleft', #crouch/slide
+#     # 'u', #reload
+#     # 'v', #repair/upgrade
+#     # 'r', #rotate
+#     # '9', #change building material
+# ]
 
 # has_at_least_one_nonzero_reward_during_learn_phase = False
 
@@ -78,7 +78,8 @@ class FortniteEnv(gym.Env):
         # self.action_space = gym.spaces.MultiDiscrete(possible_actions)
         # self.action_space = gym.spaces.Discrete(50)
         # self.action_space = gym.spaces.Discrete(10)
-        self.action_space = gym.spaces.Discrete(40)
+        # self.action_space = gym.spaces.Discrete(40)
+        self.action_space = gym.spaces.Discrete(3)
         
         self.observation_space = gym.spaces.Box(low=0, high=255,
                                             shape=(HEIGHT//RESIZE_FACTOR, WIDTH//RESIZE_FACTOR, N_CHANNELS), dtype=np.uint8)
@@ -94,7 +95,7 @@ class FortniteEnv(gym.Env):
         self.prev_right_thumb_y = 0
 
         self.score = 0
-        self.last_step_killcount = 0
+        # self.last_step_killcount = 0
         self.score_detected_cooldown_period = False
 
     def quarter_sized_screencap_np(self, screencap_img):
@@ -124,37 +125,37 @@ class FortniteEnv(gym.Env):
             return DetectionState.DETECTED_OTHER
         return DetectionState.DETECTED_NOTHING
     
-    # hardcoded to the player name and the width of of the player name
-    def got_killed_detected(self, full_img):
-        elim_ocr = self.reader.readtext(full_img[610:640, 25:115], detail=0)
-        # print("got killed detected ocr: ", elim_ocr)
-        if (len(elim_ocr) > 0):
-            for i in range(len(elim_ocr)):
-                elim_match_ratio = SequenceMatcher(None, elim_ocr[i], "fefe3532").ratio()
-                if (elim_match_ratio > 0.7):
-                    return DetectionState.DETECTED_TARGET
-            return DetectionState.DETECTED_OTHER
-        return DetectionState.DETECTED_NOTHING
+    # # hardcoded to the player name and the width of of the player name
+    # def got_killed_detected(self, full_img):
+    #     elim_ocr = self.reader.readtext(full_img[610:640, 25:115], detail=0)
+    #     # print("got killed detected ocr: ", elim_ocr)
+    #     if (len(elim_ocr) > 0):
+    #         for i in range(len(elim_ocr)):
+    #             elim_match_ratio = SequenceMatcher(None, elim_ocr[i], "fefe3532").ratio()
+    #             if (elim_match_ratio > 0.7):
+    #                 return DetectionState.DETECTED_TARGET
+    #         return DetectionState.DETECTED_OTHER
+    #     return DetectionState.DETECTED_NOTHING
     
-    def got_killed_by_guard_detected(self, full_img):
-        elim_ocr = self.reader.readtext(full_img[615:645, 30:115], detail=0)
-        # print("got killed detected ocr: ", elim_ocr)
-        if (len(elim_ocr) > 0):
-            for i in range(len(elim_ocr)):
-                elim_match_ratio = SequenceMatcher(None, elim_ocr[i], "Guard").ratio()
-                if (elim_match_ratio > 0.7):
-                    return DetectionState.DETECTED_TARGET
-            return DetectionState.DETECTED_OTHER
-        return DetectionState.DETECTED_NOTHING
+    # def got_killed_by_guard_detected(self, full_img):
+    #     elim_ocr = self.reader.readtext(full_img[615:645, 30:115], detail=0)
+    #     # print("got killed detected ocr: ", elim_ocr)
+    #     if (len(elim_ocr) > 0):
+    #         for i in range(len(elim_ocr)):
+    #             elim_match_ratio = SequenceMatcher(None, elim_ocr[i], "Guard").ratio()
+    #             if (elim_match_ratio > 0.7):
+    #                 return DetectionState.DETECTED_TARGET
+    #         return DetectionState.DETECTED_OTHER
+    #     return DetectionState.DETECTED_NOTHING
     
-    def killcount(self, full_img):
-        killcount_ocr = self.reader.readtext(full_img[80:115, 790:890], detail=0)
-        # print("got killed detected ocr: ", elim_ocr)
-        if (len(killcount_ocr) > 0):
-            # print("killcount: ", elim_ocr)
-            for i in range(len(killcount_ocr)):
-                if (killcount_ocr[i].isdigit()):
-                    return int(killcount_ocr[i])
+    # def killcount(self, full_img):
+    #     killcount_ocr = self.reader.readtext(full_img[80:115, 790:890], detail=0)
+    #     # print("got killed detected ocr: ", elim_ocr)
+    #     if (len(killcount_ocr) > 0):
+    #         # print("killcount: ", elim_ocr)
+    #         for i in range(len(killcount_ocr)):
+    #             if (killcount_ocr[i].isdigit()):
+    #                 return int(killcount_ocr[i])
 
     def step(self, action):
 
@@ -258,39 +259,70 @@ class FortniteEnv(gym.Env):
         right_thumb_x = 0
         right_thumb_y = 0            
 
-        if (action > 19):
-            pyautogui.keyDown('o')
-            print("shoot")
-            action -= 20
-        else:
-            pyautogui.keyUp('o')
+        # if (action > 19):
+        #     pyautogui.keyDown('o')
+        #     print("shoot")
+        #     action -= 20
+        # else:
+        #     pyautogui.keyUp('o')
 
-        if (action > 9):
-            pyautogui.keyDown('space')
-            print("jump")
-            action -= 10
-        else:
-            pyautogui.keyUp('space')
+        # if (action > 9):
+        #     pyautogui.keyDown('space')
+        #     print("jump")
+        #     action -= 10
+        # else:
+        #     pyautogui.keyUp('space')
 
-        if (action > 4):
-            pyautogui.keyDown('ctrlleft')
-            print("crouch")
-            action -= 5
-        else:
-            pyautogui.keyUp('ctrlleft')
+        # if (action > 4):
+        #     pyautogui.keyDown('ctrlleft')
+        #     print("crouch")
+        #     action -= 5
+        # else:
+        #     pyautogui.keyUp('ctrlleft')
 
-        match action:
-            case 0:
-                right_thumb_x = -1
-            case 1:
-                right_thumb_x = -0.5
-            case 2:
-                right_thumb_x = 0
-            case 3:
-                right_thumb_x = 0.5
-            case 4:
-                right_thumb_x = 1
-        print("right_thumb_x: ", right_thumb_x)                
+        # match action:
+        #     case 0:
+        #         right_thumb_x = -1
+        #     case 1:
+        #         right_thumb_x = -0.5
+        #     case 2:
+        #         right_thumb_x = 0
+        #     case 3:
+        #         right_thumb_x = 0.5
+        #     case 4:
+        #         right_thumb_x = 1
+
+
+        # if (action > 5):
+        #     pyautogui.keyDown('w')
+        #     pyautogui.keyUp('s')
+        #     print('w')
+        #     action -= 6
+        # else:
+        #     pyautogui.keyDown('s')
+        #     pyautogui.keyUp('w')
+        #     print('s')
+
+        # if (action > 2):
+        #     pyautogui.keyDown('a')
+        #     pyautogui.keyUp('d')
+        #     print('a')
+        #     action -= 3
+        # else:
+        #     pyautogui.keyDown('d')
+        #     pyautogui.keyUp('a')
+        #     print('d')
+
+        pyautogui.keyDown('w')            
+
+        if action == 2:
+            right_thumb_x = -1
+        elif action == 1:
+            right_thumb_x = 0
+        elif action == 0:
+            right_thumb_x = 1
+
+        # print("right_thumb_x: ", right_thumb_x)                
         gamepad.right_joystick_float(x_value_float=right_thumb_x, y_value_float=right_thumb_y)
         gamepad.update()
 
@@ -329,9 +361,10 @@ class FortniteEnv(gym.Env):
                 score_detected = self.score_detected(player_full_img)
                 if score_detected == DetectionState.DETECTED_TARGET:
                     if not self.score_detected_cooldown_period:
-                        reward += 5
+                        # reward += 5
+                        reward = 1
                         self.score_detected_cooldown_period = True
-                        print(f"step {self.cur_step} score detected add five {reward}")
+                        print(f"step {self.cur_step} score detected reward {reward}")
                 elif score_detected == DetectionState.DETECTED_NOTHING:
                     self.score_detected_cooldown_period = False  
             except Exception as e:
@@ -353,36 +386,36 @@ class FortniteEnv(gym.Env):
             # except Exception as e:
             #     print(f"step {self.cur_step} killcount ocr failed {e}")
 
-            try:
-                # opponent_killed_player_detected = self.got_killed_detected(player_full_img)
-                opponent_killed_player_detected = self.got_killed_by_guard_detected(player_full_img)
+            # try:
+            #     # opponent_killed_player_detected = self.got_killed_detected(player_full_img)
+            #     opponent_killed_player_detected = self.got_killed_by_guard_detected(player_full_img)
 
-                if opponent_killed_player_detected == DetectionState.DETECTED_TARGET:
-                    if not self.opponent_killed_player_cooldown_period:
-                        # reward -= 2000
-                        # reward = min(math.log10((self.step_since_last_reset+1)/10000), -.05)
-                        reward -= 10
-                        self.opponent_killed_player_cooldown_period = True
-                        print(f"step {self.cur_step} opponent killed player punish {reward}")
-                elif opponent_killed_player_detected == DetectionState.DETECTED_NOTHING:
-                    if self.opponent_killed_player_cooldown_period:
-                        self.opponent_killed_player_cooldown_period = False
-                        print(f"step {self.cur_step} opponent killed player cooldown period terminated episode")
-                        return player_obs, 0, True, False, {}
+            #     if opponent_killed_player_detected == DetectionState.DETECTED_TARGET:
+            #         if not self.opponent_killed_player_cooldown_period:
+            #             # reward -= 2000
+            #             # reward = min(math.log10((self.step_since_last_reset+1)/10000), -.05)
+            #             reward -= 10
+            #             self.opponent_killed_player_cooldown_period = True
+            #             print(f"step {self.cur_step} opponent killed player punish {reward}")
+            #     elif opponent_killed_player_detected == DetectionState.DETECTED_NOTHING:
+            #         if self.opponent_killed_player_cooldown_period:
+            #             self.opponent_killed_player_cooldown_period = False
+            #             print(f"step {self.cur_step} opponent killed player cooldown period terminated episode")
+            #             return player_obs, 0, True, False, {}
                     
-                    self.opponent_killed_player_cooldown_period = False  
-            except Exception as e:
-                print(f"step {self.cur_step} opponent killed player detect failed {e}")
+            #         self.opponent_killed_player_cooldown_period = False  
+            # except Exception as e:
+            #     print(f"step {self.cur_step} opponent killed player detect failed {e}")
 
-            try:
-                feet_location = pyautogui.locateOnScreen('media/feet.png', confidence=0.6)
-                if ((feet_location.top  + feet_location.height / 2) < HEIGHT / 2):
-                    reward += 0.02
-                    # print("punish for feet")
-                    print("reward for feet")
-            except Exception as e:
-                pass
-                # print(f"step {self.cur_step} feet detection failed {e}")
+            # try:
+            #     feet_location = pyautogui.locateOnScreen('media/feet.png', confidence=0.6)
+            #     if ((feet_location.top  + feet_location.height / 2) < HEIGHT / 2):
+            #         reward += 0.02
+            #         # print("punish for feet")
+            #         print("reward for feet")
+            # except Exception as e:
+            #     pass
+            #     # print(f"step {self.cur_step} feet detection failed {e}")
 
             # if self.use_yolo_reward:
             #     try:
@@ -420,12 +453,18 @@ class FortniteEnv(gym.Env):
             #     except Exception as e:
             #         print(f"step {self.cur_step} yolo failed {e}")
 
+
         
         truncated = False
         info = {}
 
         if player_obs is None:
             player_obs = np.zeros((HEIGHT//RESIZE_FACTOR, WIDTH//RESIZE_FACTOR, N_CHANNELS), dtype=np.uint8)
+
+        if self.step_since_last_reset >= 5000:
+            print("terminate at step since last reset: ", self.step_since_last_reset, " cur step: ", self.cur_step)
+            terminated = True
+            return player_obs, reward, True, False, {}
 
         # global has_at_least_one_nonzero_reward_during_learn_phase
         # if reward != 0:
@@ -440,22 +479,24 @@ class FortniteEnv(gym.Env):
         pass
 
     def reset(self, seed=None, options=None):
+        pyautogui.keyDown('w')            
+
         print("reset")
         player_obs = None
         try:
             player_obs = self.quarter_sized_screencap_np(self.cam.grab())
         except:
             player_obs = np.zeros((HEIGHT//RESIZE_FACTOR, WIDTH//RESIZE_FACTOR, N_CHANNELS), dtype=np.uint8)
-        self.prev_right_thumb_x = 0
-        self.prev_right_thumb_y = 0
+        # self.prev_right_thumb_x = 0
+        # self.prev_right_thumb_y = 0
         gamepad.reset()
         gamepad.update()
-        for key in holdable_vertical_move_keys:
-            pyautogui.keyUp(key)
-        for key in holdable_horizontal_move_keys:
-            pyautogui.keyUp(key)
-        for key in holdable_keys:
-            pyautogui.keyUp(key)
+        # for key in holdable_vertical_move_keys:
+        #     pyautogui.keyUp(key)
+        # for key in holdable_horizontal_move_keys:
+        #     pyautogui.keyUp(key)
+        # for key in holdable_keys:
+        #     pyautogui.keyUp(key)
         self.step_since_last_reset = 0
         # Image.fromarray(player_obs).show()
         return player_obs, {}
@@ -464,10 +505,12 @@ class FortniteEnv(gym.Env):
         print("start cleanup")
         gamepad.reset()
         gamepad.update()
-        for key in holdable_vertical_move_keys:
-            pyautogui.keyUp(key)
-        for key in holdable_horizontal_move_keys:
-            pyautogui.keyUp(key)
-        for key in holdable_keys:
-            pyautogui.keyUp(key)
+        pyautogui.keyUp('w')
+        # for key in holdable_vertical_move_keys:
+        #     pyautogui.keyUp(key)
+        # for key in holdable_horizontal_move_keys:
+        #     pyautogui.keyUp(key)
+        # for key in holdable_keys:
+        #     pyautogui.keyUp(key)
         print("done cleanup")
+

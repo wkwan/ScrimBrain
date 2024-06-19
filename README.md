@@ -1,10 +1,42 @@
-# ScrimBrain Fortnite Bots
+# Reinforcement Learning in Fortnite With Real-Time Screencapture and Windows Input Simulation
 
-### TLDR: Practice bots in Fortnite could be useful but UEFN doesn't let you control the player or train/run neural nets. This is a hacky demo of 2 use cases for practice bots. If you find this useful, give this a star and hopefully Epic will launch something like the API that allows [RLBot](https://github.com/RLBot/RLBot) to work for Rocket League. The methods used here are a PITA for development.
+### Motivation: How do you train a reinforcement learning agent to play a game without special access to the game like source code access, API access, or RAM hacking? And can you do it with 1 GPU?
 
-## Simple Use Case: Wall Holding
+Most games don't have API access and most developers don't have access to GPU farms. If we can train AI to play Fortnite on a single PC, we can train AI to play almost any game on a single PC. This could be useful as practice tools for competitive players, and or for automated playtesting (finding bugs, game balancing, etc.).
 
-This initial motivation for this project was to develop a bot to hold a wall in Fortnite, so players can practice the wall stealing mechanic without a practice partner. Because Fortnite doesn't have an API to control the player, we did this by simulating Windows keypresses in Python. 
+ScrimBrain works similarly to how [OpenAI Universe](https://github.com/openai/universe) and [SerpentAI](https://github.com/SerpentAI/SerpentAI) worked. The challenge with using screencapture is that it requires more training and bigger models compared to using an MLP that takes useful game state features like player positions, inventory, etc. as inputs. It also makes it harder to write a reward function. The benefit is that it could be extended to support almost any PC game.
+
+## Run the example reinforcement learning agent trained on a custom Fortnite map
+
+_TODO add demo gif_
+
+In this map, the goal is to run the target as fast as possible. The model was trained by getting a reward by detecting the blue **SCORE** text that appears on the screen when reaching the target.
+
+1. Clone this repo
+2. Download the checkpoint: _TODO share ckpt_
+3. Setup the conda environment
+```
+conda env create -f environment.yml
+conda activate scrimbrain
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+```
+4. Fullscreen Fortnite at 1920x1080 on your main monitor. The Python script will take screencaptures at this resolution on your main monitor. The full-sized screencapture will be used for the reward function, while the neural net will see a downscaled screencapture.
+5. Setup your keybinds to match the training environment keybinds in [fortnite_env.py](fortnite_env.py)
+6. Load into the map **ScrimBrain Race Example** (map code 7340-6949-212). Don't move the cursor, the model can only look left/right and not up/down, so if you move the cursor up/down, you'll be showing the model a different perspective than what it was trained on, and it won't be able to correct it during inference.
+7. Run the model. If your terminal is on another monitor, make sure to move the cursor to the main Fortnite monitor after running the script, click the screen to set the focus to the main monitor, and don't move the cursor afterwards.
+```
+python run_model.py --checkpoint_path=YOUR_CHECKPOINT_PATH
+```
+
+## Train a reinforcement learning agent using screencapture + Windows Input Simulation
+
+_TODO_
+
+## Misc
+
+Sometimes you don't need AI, macros are good enough.
+
+A simple Fortnite use case for macros that isn't cheating is holding a wall. This lets players can practice the wall stealing mechanic without a practice partner.
 
 The very simple script to hold the wall (or other build piece) is [hold_wall.py](hold_wall.py). It requires manual tweaking but it works for basic practice. 
 
@@ -19,32 +51,3 @@ Here's what this looks like for the wall stealing player. The bot is in the box 
 
 You can use our map **Steal My Wall!** to practice 7 different build piece stealing scenarios: https://www.fortnite.com/@coachdody/2191-1425-4724 
 
-## Complex Use Case: 1v1 Zerobuild Fight
-
-Since we can simulate Windows inputs, and also ingest real-time screencapture of Fortnite, we can train reinforcement learning agents for Fortnite. This is like how [OpenAI Universe](https://github.com/openai/universe) and [SerpentAI](https://github.com/SerpentAI/SerpentAI) worked. The problem is that it requires more training and bigger models compared to using an MLP that takes useful game state features like player positions, inventory, etc. as inputs. The benefit is that it could be extended to support almost any PC game.
-
-The current debugging model is trained on this map: https://www.fortnite.com/@necrogames/8136-5511-4930 
-
-Checkpoint: https://drive.google.com/file/d/1YQMV1YDcrUWauTdafpmKbVrT74jLi9Pn/view?usp=sharing
-
-Demo: https://youtu.be/OnpnFiNthDA?feature=shared&t=39
-
-It should work best using the same map and skins shown in the demo, but it isn't very smart regardless and training for more timesteps doesn't seem to help. One possible reason is that the screencapture is too complex for the model to learn. Another possible reason is the training setup. We trained 2 neural nets simultaneously (one for the chicken and one for the default blonde female character) so that we could generate infinite 1v1 gameplay training data that improves (in terms of gameplay level) as the models improve. But the random initialization might make the initial training data quality too low, so the model converges too early.
-
-### Run the Pretrained Model
-
-Setup your keybinds to match the training environment keybinds in [fortnite_env.py](fortnite_env.py)
-
-Fullscreen Fortnite at 1920x1080 on your main monitor.
-
-Load into the map (**1V1, 1 HP, 1X1 BOX** 8136-5511-4930).
-
-```
-conda env create -f environment.yml
-conda activate scrimbrain
-conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-python run_model.py --checkpoint_path=YOUR_CHECKPOINT_PATH
-```
-
-### Train Your Own Model
-If you really want to try, you can open an issue and [@wkwan](https://www.github.com/wkwan) will try to help.

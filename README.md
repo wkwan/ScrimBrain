@@ -28,7 +28,7 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 python run_model.py --checkpoint_path=YOUR_CHECKPOINT_PATH
 ```
 
-## Train a reinforcement learning agent using screencapture + Windows Input Simulation
+## Train a reinforcement learning agent using screencapture + Windows input simulation
 
 _TODO_
 

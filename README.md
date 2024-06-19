@@ -8,12 +8,12 @@ ScrimBrain works similarly to how [OpenAI Universe](https://github.com/openai/un
 
 ## Run the example reinforcement learning agent trained on a custom Fortnite map
 
-_TODO add demo gif_
+![](https://github.com/wkwan/ScrimBrain/blob/master/media/scrimbrain-race-example.gif)
 
 In this map, the goal is to run the target as fast as possible. The model was trained by getting a reward by detecting the blue **SCORE** text that appears on the screen when reaching the target.
 
 1. Clone this repo
-2. Download the checkpoint: _TODO share ckpt_
+2. Download the checkpoint: https://drive.google.com/file/d/1xly-4-C2f_PWK2g_3Ks18AbdkUllRpyV/view?usp=sharing
 3. Setup the conda environment
 ```
 conda env create -f environment.yml

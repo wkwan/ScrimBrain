@@ -20,9 +20,21 @@ conda env create -f environment.yml
 conda activate scrimbrain
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 ```
-4. Fullscreen Fortnite at 1920x1080 on your main monitor. The Python script will take screencaptures at this resolution on your main monitor. The full-sized screencapture will be used for the reward function, while the neural net will see a downscaled screencapture.
-5. Setup your keybinds to match the training environment keybinds in [fortnite_env.py](fortnite_env.py)
-6. Load into the map **ScrimBrain Race Example** (map code 7340-6949-212). Don't move the cursor, the model can only look left/right and not up/down, so if you move the cursor up/down, you'll be showing the model a different perspective than what it was trained on, and it won't be able to correct it during inference.
+4. Set your main monitor resolution to 1920x1080 (and 60Hz if possible) to match the training setup. Fullscreen Fortnite on your main monitor. The Python script will take screencaptures at this resolution on your main monitor. The full-sized screencapture will be used for the reward function, while the neural net will see a downscaled screencapture.
+5. Set these game settings and leave the rest to default:
+Window Mode: Fullscreen
+Resolution: 1920 x 1080
+Vsync: ON
+Frame Rate Limit: 60 FPS
+Rendering Mode: Performance - Lower Graphical Fidelity
+3D Resolution: 0%
+View Distance: Epic
+Textures: Low
+Meshes: Low
+X-Axis Sensitivity: 3.8%
+Move Forward: W
+HUD Options: turn everything off
+6. Load into the map **ScrimBrain Race Example** (map code 7340-6949-212). Don't move the cursor, the model can only look left/right and not up/down, so if you move the cursor up/down, you'll be showing the model a different perspective than what it was trained on, and it won't be able to correct it during inference. Note that the framerate of the model isn't rate-limited, so it depends on how fast your PC can chug through frames and run inference. It's possible that this will cause reproducibility issues.
 7. Run the model. If your terminal is on another monitor, make sure to move the cursor to the main Fortnite monitor after running the script, click the screen to set the focus to the main monitor, and don't move the cursor afterwards.
 ```
 python run_model.py --checkpoint_path=YOUR_CHECKPOINT_PATH

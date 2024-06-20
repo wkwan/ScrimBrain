@@ -2,8 +2,6 @@ import fortnite_env
 import os 
 import argparse
 import atexit
-# from sb3_contrib import RecurrentPPO
-# from stable_baselines3 import A2C
 from stable_baselines3 import DQN
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.env_util import make_vec_env

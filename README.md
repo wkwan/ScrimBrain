@@ -34,7 +34,7 @@ Textures: Low
 Meshes: Low  
 X-Axis Sensitivity: 3.8%  
 Move Forward: W  
-HUD Options: turn everything off
+HUD Options: HUD Scale 125%, turn everything else off
 ```
 6. Load into the map **ScrimBrain Race Example** (map code 7340-6949-212). Don't move the cursor, the model can only look left/right and not up/down, so if you move the cursor up/down, you'll be showing the model a different perspective than what it was trained on, and it won't be able to correct it during inference. Note that the framerate of the model isn't rate-limited, so it depends on how fast your PC can chug through frames and run inference. It's possible that this will cause reproducibility issues.
 7. Run the model. If your terminal is on another monitor, make sure to move the cursor to the main Fortnite monitor after running the script, click the screen to set the focus to the main monitor, and don't move the cursor afterwards.

@@ -36,13 +36,13 @@ starting_timestep = 0
 env = None
 if os.path.isfile(checkpoint_path):
     starting_timestep = args.checkpoint_timestep
-    env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, n_stack=4, starting_timestep=starting_timestep)
+    env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1), n_stack=4, starting_timestep=starting_timestep)
     print("loaded model")
     model = DQN.load(checkpoint_path)
     model.set_env(env)
 else:
     print("new model")
-    env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1, n_stack=4, starting_timestep=0)
+    env = VecFrameStackSaveOnKill(make_vec_env(fortnite_env.FortniteEnv, n_envs=1), n_stack=4, starting_timestep=0)
     Path(f'{args.checkpoint_folder}/img_score').mkdir(parents=True, exist_ok=True)
     model = DQN("CnnPolicy", env, buffer_size=20000, verbose=1, tensorboard_log=f'{args.checkpoint_folder}/tensorboard')
 

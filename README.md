@@ -64,6 +64,8 @@ python visualize_model.py --checkpoint_path=PATH_TO_DQN_MODEL --framestack_folde
 
 Modify the **module_activations** variable in [visualize_model.py](visualize_model.py) to visualize different activations.
 
+[visualize_model.py](visualize_model.py) can be easily adapted to different architectures with different activations.
+
 ## Misc
 
 Sometimes you don't need AI, macros are good enough.

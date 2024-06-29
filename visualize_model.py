@@ -39,6 +39,9 @@ joined_np_obs = np.concatenate(tuple(framestack_imgs), axis=2)
 
 model = DQN.load(args.checkpoint_path)
 
+# helpful for figuring out which activations to visualize
+print(model.policy)
+
 activations_list = []
 
 def get_values(name):

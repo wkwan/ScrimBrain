@@ -20,14 +20,10 @@ args = parser.parse_args()
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
+# for visualizing in real-time during inference
 # env = VecFrameStack(make_vec_env(fortnite_env.FortniteEnv, n_envs=1), n_stack=4)
 # atexit.register(env.close)
 # obs = env.reset()
-
-# obs_0 = Image.open(r"C:\Users\wkwn9\Desktop\scrimbrain\240609-dqntrack\img_score\step_9531_0_score.png")
-# obs_1 = Image.open(r"C:\Users\wkwn9\Desktop\scrimbrain\240609-dqntrack\img_score\step_9531_1_score.png")
-# obs_2 = Image.open(r"C:\Users\wkwn9\Desktop\scrimbrain\240609-dqntrack\img_score\step_9531_2_score.png")
-# obs_3 = Image.open(r"C:\Users\wkwn9\Desktop\scrimbrain\240609-dqntrack\img_score\step_9531_3_score.png")
 
 framestack_img_paths = os.listdir(args.framestack_folder_path)
 

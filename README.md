@@ -56,6 +56,14 @@ To train from a checkpoint:
 python train_model.py --checkpoint_folder=YOUR_CKPT_FOLDER --checkpoint_timestep=TIMESTEP_INT
 ```
 
+## Visualize the convolutional filters in a pretrained DQN model
+
+```
+python visualize_model.py --checkpoint_path=PATH_TO_DQN_MODEL --framestack_folder_path=PATH_TO_FOLDER_WITH_4_FRAMESTCK_IMGS --output_path=OUTPUT_PATH
+```
+
+Modify the **module_activations** variable in [visualize_model.py](visualize_model.py) to visualize different activations.
+
 ## Misc
 
 Sometimes you don't need AI, macros are good enough.

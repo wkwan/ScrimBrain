@@ -22,7 +22,8 @@ import time
 gamepad = vg.VX360Gamepad()
 
 N_CHANNELS = 3
-HEIGHT = 1080
+HEIGHT=1080
+# HEIGHT = 1200
 WIDTH = 1920
 
 RESIZE_FACTOR = 8
@@ -56,7 +57,12 @@ class FortniteEnv(gym.Env):
     
     # detect the SCORE text when the player reaches a trigger
     def score_detected(self, full_img):
+        #1920x1080
         elim_ocr = self.reader.readtext(full_img[415:455, 975:1115], detail=0)
+
+        #1920x1200
+        # elim_ocr = self.reader.readtext(full_img[480:515, 990:1115], detail=0)
+
         if (len(elim_ocr) > 0):
             for i in range(len(elim_ocr)):
                 elim_match_ratio = SequenceMatcher(None, elim_ocr[i], "SCORE").ratio()

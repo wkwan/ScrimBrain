@@ -85,3 +85,5 @@ Here's what this looks like for the wall stealing player. The bot is in the box 
 
 You can use our map **Steal My Wall!** to practice 7 different build piece stealing scenarios: https://www.fortnite.com/@coachdody/2191-1425-4724 
 
+In addition to the guided practice areas, **Steal My Wall!** has a 1v1 competitive mode focused on stealing pieces, taking good peeks, and strategically using exploits to get into your opponent’s box.
+

@@ -1,4 +1,4 @@
-# Reinforcement Learning in Fortnite With Real-Time Screencapture and Windows Input Simulation
+# Reinforcement Learning in Fortnite With Real-Time Screen Capture and Windows Input Simulation
 
 ### Motivation: How do you train a reinforcement learning agent to play a game without special access to the game like source code access, API access, or RAM hacking? And can you do it with 1 GPU?
 

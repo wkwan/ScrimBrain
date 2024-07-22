@@ -6,6 +6,10 @@ Most games don't have API access and most developers don't have access to GPU fa
 
 ScrimBrain works similarly to how [OpenAI Universe](https://github.com/openai/universe) and [SerpentAI](https://github.com/SerpentAI/SerpentAI) worked. The challenge with using screencapture is that it requires more training and bigger models compared to using an MLP that takes useful game state features like player positions, inventory, etc. as inputs. It also makes it harder to write a reward function. The benefit is that it could be extended to support almost any PC game.
 
+### Watch the YouTube Vid 👀
+
+[![YouTube](http://i.ytimg.com/vi/iFAe7x2Nos8/hqdefault.jpg)](https://www.youtube.com/watch?v=iFAe7x2Nos8)
+
 ## Run the example reinforcement learning agent trained on a custom Fortnite map
 
 ![](https://github.com/wkwan/ScrimBrain/blob/master/media/scrimbrain-race-example.gif)

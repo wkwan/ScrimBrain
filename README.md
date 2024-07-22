@@ -1,4 +1,4 @@
-# Reinforcement Learning in Fortnite With Real-Time Screencapture and Windows Input Simulation
+# Reinforcement Learning in Fortnite With Real-Time Screen Capture and Windows Input Simulation
 
 ### Motivation: How do you train a reinforcement learning agent to play a game without special access to the game like source code access, API access, or RAM hacking? And can you do it with 1 GPU?
 
@@ -84,4 +84,6 @@ Here's what this looks like for the wall stealing player. The bot is in the box 
 ![](https://github.com/wkwan/ScrimBrain/blob/master/media/wall-steal.gif)
 
 You can use our map **Steal My Wall!** to practice 7 different build piece stealing scenarios: https://www.fortnite.com/@coachdody/2191-1425-4724 
+
+In addition to the guided practice areas, **Steal My Wall!** has a 1v1 competitive mode focused on stealing pieces, taking good peeks, and strategically using exploits to get into your opponent’s box.
 

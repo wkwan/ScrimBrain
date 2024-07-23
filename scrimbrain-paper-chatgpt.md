@@ -372,51 +372,51 @@ way to do it
 
 # RESPONSE
 
-## Title: Reinforcement Learning for Fortnite: Experiments with Scrimbrain
+## Title: Reinforcement Learning for Fortnite: Experiments with ScrimBrain
 
 ### Authors:
 
 ### Abstract
-This paper explores the application of reinforcement learning to train AI agents in Fortnite using the Scrimbrain codebase. We conduct several experiments to automate playtesting for game developers and competitive gamers. The results demonstrate the challenges and potential of reinforcement learning in dynamic game environments.
+This paper explores the application of reinforcement learning to train AI agents in Fortnite using the ScrimBrain codebase. We conduct several experiments as a first step towards using reinforcement learning for automated playtesting and esports practice tools. The results demonstrate the challenges and potential of reinforcement learning in dynamic game environments.
 
 ### 1. Introduction
 #### Literature Review
-Reinforcement learning (RL) has been a prominent method in training AI agents for games. Notable successes include DeepMind's AlphaGo and OpenAI's Dota 2 bots, which have surpassed human experts. However, practical tools for game developers and competitive gamers remain limited. This paper aims to bridge this gap by utilizing the Scrimbrain codebase to train AI agents for Fortnite, a complex and popular battle royale game.
+Reinforcement learning (RL) has been a prominent method in training AI agents for games. Notable successes include DeepMind's AlphaGo and OpenAI's Dota 2 bots, which have defeated top pros. However, practical tools for game developers and competitive gamers remain limited. This paper aims to bridge this gap by utilizing the ScrimBrain codebase to train AI agents for Fortnite, a complex and popular battle royale game.
 
 ### 2. Methodology
 #### Approach
-Our approach involves training neural networks to play Fortnite by using real-time screen capture and reinforcement learning techniques. We hypothesize that AI can be effectively trained to perform specific in-game tasks, despite the complexities of the game environment.
+Our approach involves training neural networks to play Fortnite by using real-time screen capture, Windows input simulation, and reinforcement learning techniques. We hypothesize that AI can be effectively trained to perform specific in-game tasks, despite the complexities of the game environment.
 
 #### Hypothesis
 We hypothesize that:
 1. AI can learn to perform basic actions in Fortnite through reinforcement learning.
 2. Simplifying the action space will improve learning efficiency.
-3. Using image recognition for audio cues will enhance AI performance.
+3. A carefully written reward function is criticial for learning.
 
 ### 3. Experiments
 #### Experimental Setup
-The experiments were conducted using the Scrimbrain codebase. The initial setup involved two neural networks fighting each other in a simplified Fortnite environment with disabled building mechanics. The experiments aimed to:
+The experiments were conducted using the ScrimBrain codebase. The experiments aimed to:
 1. Train AI agents to maximize their survival and combat effectiveness.
 2. Evaluate the impact of various reward functions and training configurations.
 
 #### Experiment 1: Initial Training
 - **Objective**: Train AI agents in a simplified environment.
-- **Setup**: Two AI agents with infinite ammo, no building mechanics, fighting in a small box with 1 HP each.
-- **Outcome**: The AI agents learned to hug walls but showed poor aiming capabilities.
+- **Setup**: The initial setup involved 2 neural networks fighting each other in a simplified Fortnite environment with disabled building mechanics. The AI agents had infinite ammo and fought in a small box with 1 HP each.
+- **Outcome**: The AI agents learned to hug walls and corners but showed poor aiming capabilities.
 
 #### Experiment 2: Facing the Enemy
 - **Objective**: Improve AI aiming by rewarding facing the enemy.
-- **Setup**: Used YOLO object detection to reward facing the opponent.
+- **Setup**: Same as Experiment 1, but also used YOLO object detection to reward facing the opponent.
 - **Outcome**: No significant improvement in AI performance.
 
-#### Experiment 3: Simplified Action Space
-- **Objective**: Simplify the action space to improve learning.
+#### Experiment 3: Simplify Action Space and Only Use 1 Neural Network
+- **Objective**: Simplify the action space to make learning easier. Instead of using 2 neural networks (which requires 2 PC's because Fortnite anti-cheat prevents a single PC from running 2 instances of Fortnite), use a signle neural network and have them fight against the built-in Fortnite bot.
 - **Setup**: AI can only pivot horizontally, jump, crouch, and shoot. Used image detection for audio cues.
-- **Outcome**: Slight improvement, but AI still struggled.
+- **Outcome**: Slight improvement, but AI still didn't show clear clear signs of learning.
 
 #### Experiment 4: Running to a Target
 - **Objective**: Train AI to run towards a target.
-- **Setup**: AI moves forward continuously and can only look left, right, or straight. Used DQN algorithm.
+- **Setup**: AI moves forward continuously and can only look left, right, or straight. Used DQN algorithm which has been shown to be more sample efficient.
 - **Outcome**: Successful training, with AI learning to reach targets efficiently.
 
 ### 4. Results
@@ -427,11 +427,7 @@ The experiments were conducted using the Scrimbrain codebase. The initial setup 
 - Placeholder for visualizations generated by `visualize_model.py`, illustrating the learned behavior of AI agents.
 
 ### 5. Discussion
-The experiments highlight the challenges in training AI for complex games like Fortnite. Simplifying the action space and using targeted rewards were crucial for achieving reasonable performance. The use of real-time screen capture and reinforcement learning proved feasible but required significant computational resources and fine-tuning.
+The experiments highlight the challenges in training AI for complex games like Fortnite. Simplifying the action space and using targeted rewards were crucial for achieving reasonable performance. The use of real-time screen capture and reinforcement learning proved feasible but required significant computational resources.
 
 ### 6. Conclusion
-This study demonstrates the potential of reinforcement learning in training AI agents for Fortnite. While the initial results are promising, further research is needed to handle more complex tasks, such as building and editing. The Scrimbrain codebase provides a foundation for future work in this area, with potential applications in automated playtesting and strategy development for competitive gaming.
-
----
-
-Feel free to provide any additional information or adjustments you'd like to see in this paper.
+This study demonstrates the potential of reinforcement learning in training AI agents for Fortnite. While the initial results are promising, further research is needed to handle more complex tasks, such as building and editing. The ScrimBrain codebase provides a foundation for future work in this area, with potential applications in automated playtesting and esports practice tools.
